@@ -36,6 +36,7 @@
             opacity: 0;
             transform: translateY(20px);
         }
+        
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.2s; }
         .delay-300 { animation-delay: 0.3s; }
@@ -91,6 +92,7 @@
             justify-content: space-between;
             min-height: 240px;
         }
+
         .grid-item:hover { background: #0A0A0A; }
         .grid-item:hover .metric-value { color: var(--accent-orange); transform: scale(1.02); }
 
@@ -103,6 +105,7 @@
             line-height: 1;
             margin-bottom: 1rem;
         }
+
         .metric-label {
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -110,6 +113,7 @@
             color: #888;
             font-weight: 600;
         }
+        
         .grid-dot {
             width: 6px;
             height: 6px;
@@ -136,29 +140,17 @@
 
         /* --- EDITORIAL TESTIMONIAL CARDS --- */
         .review-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            transition: all 0.3s ease;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+            background: #FFFFFF; border: 1px solid rgba(0, 0, 0, 0.05); padding: 2.5rem;
+            display: flex; flex-direction: column; justify-content: space-between; height: 100%;
+            transition: all 0.3s ease; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
         }
         .review-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
             border-color: rgba(235, 94, 40, 0.2);
         }
         .quote-mark {
-            font-size: 4rem;
-            line-height: 0.5;
-            color: var(--accent-orange);
-            font-family: serif;
-            margin-bottom: 1.5rem;
-            opacity: 0.4;
+            font-size: 4rem; line-height: 0.5; color: var(--accent-orange); font-family: serif;
+            margin-bottom: 1.5rem; opacity: 0.4;
         }
         .avatar-img { filter: grayscale(100%); transition: filter 0.3s ease; }
         .review-card:hover .avatar-img { filter: grayscale(0%); }
@@ -215,9 +207,11 @@
                 <span class="w-3 h-3 bg-orange-600 rounded-full"></span>
                 Roam.
             </a>
+            
             <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-900">
                 <a href="#method" class="hover:text-orange-600 transition-colors font-bold">The Method</a>
                 <a href="#work" class="hover:text-orange-600 transition-colors font-bold">Mission Logs</a>
+                <!-- NAV CTA: Points to Application -->
                 <a href="apply.html" class="btn-primary px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-orange-600/20">
                     Get Audit
                 </a>
@@ -239,6 +233,7 @@
                 <p class="text-xl md:text-2xl text-gray-800 max-w-xl leading-relaxed">
                     We build the predictive infrastructure that maximizes LTV. Stop chasing acquisition. Start owning your retention.
                 </p>
+                <!-- HERO CTA: Points to Application -->
                 <a href="apply.html" class="group flex items-center gap-2 text-lg font-bold border-b-2 border-black pb-1 hover:text-orange-600 hover:border-orange-600 transition-all">
                     Start the Journey
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -345,6 +340,7 @@
                 </div>
                 <div class="flex flex-col items-start justify-end">
                     <p class="text-lg text-gray-700 mb-8">We replace "marketing campaigns" with engineered loops. Our operating system connects data, messaging, and product experience into a single retention engine.</p>
+                    <!-- METHOD CTA: Points to Application -->
                     <a href="apply.html" class="btn-primary px-8 py-4 rounded-full text-base font-bold uppercase tracking-widest">
                         Deploy The OS
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -396,13 +392,14 @@
                     <span class="text-orange-600 font-bold tracking-widest uppercase text-xs mb-4 block">Proven Outcomes</span>
                     <h2 class="text-4xl md:text-5xl font-bold text-black">Mission Logs.</h2>
                 </div>
-                <a href="apply.html" class="hidden md:inline-flex btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest">
+                <!-- MISSION LOG CTA: Points to Case Studies Template -->
+                <a href="case-study.html" class="hidden md:inline-flex btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest">
                     Access Full Database
                 </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-                <!-- Case 1 -->
+                <!-- Case 1: Points to Mission Log Template -->
                 <a href="case-study.html" class="group cursor-pointer block">
                     <div class="case-card h-[450px] mb-6 shadow-xl shadow-black/5">
                         <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Case Study 1">
@@ -417,8 +414,8 @@
                     </div>
                 </a>
 
-                <!-- Case 2 -->
-                <div class="group cursor-pointer">
+                <!-- Case 2: Points to Mission Log Template -->
+                <a href="case-study.html" class="group cursor-pointer block">
                     <div class="case-card h-[450px] mb-6 shadow-xl shadow-black/5">
                         <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Case Study 2">
                     </div>
@@ -430,11 +427,12 @@
                         </div>
                         <span class="text-4xl font-bold text-black">-18%</span>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="md:hidden text-center">
-                <a href="apply.html" class="btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest w-full">
+                <!-- MISSION LOG CTA MOBILE: Points to Case Studies Template -->
+                <a href="case-study.html" class="btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest w-full">
                     Access Full Database
                 </a>
             </div>
@@ -453,6 +451,7 @@
                             Most agencies profit when you stay confused. We profit when you grow. Our "Blueprint" is a transparent, data-first engagement model designed to install capability, not dependency.
                         </p>
                     </div>
+                    <!-- BLUEPRINT CTA: Points to Application -->
                     <a href="apply.html" class="btn-primary px-8 py-4 rounded-full text-base font-bold uppercase tracking-widest self-start">
                         Initialize Audit
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -566,7 +565,8 @@
                             The journey to profitability shouldn't be a mystery. We engineer the path.
                         </p>
                         <div class="flex flex-col sm:flex-row gap-4">
-                             <a href="apply.html" class="btn-primary px-8 py-3 rounded-full text-white font-bold text-center">
+                             <!-- FOOTER CTA: Points to Application -->
+                             <a href="application.html" class="btn-primary px-8 py-3 rounded-full text-white font-bold text-center">
                                  Request Audit &rarr;
                              </a>
                         </div>
