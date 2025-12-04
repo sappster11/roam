@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --accent-orange: #EB5E28;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--bg-black);
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: var(--accent-orange); color: white; }
+        
+        /* Custom List Styling */
+        .legal-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .legal-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="py-20 px-6">
+
+    <!-- Consistent Navigation -->
+    <nav class="fixed top-0 left-0 w-full p-6 flex justify-between items-center bg-[#FDFCF8]/90 backdrop-blur-md border-b border-black/5 z-50">
+        <a href="index.html" class="text-2xl font-extrabold tracking-tight text-black flex items-center gap-2">
+            <span class="w-3 h-3 bg-orange-600 rounded-full"></span>
+            Roam.
+        </a>
+        <a href="index.html" class="text-sm font-bold uppercase tracking-widest hover:text-orange-600 transition-colors">Return Home</a>
+    </nav>
+
+    <main class="max-w-3xl mx-auto mt-20 mb-20">
+        <h1 class="text-5xl font-bold mb-2">Terms of Service.</h1>
+        <p class="text-gray-500 mb-16">Effective Date: November 1, 2025</p>
+
+        <div class="space-y-16 text-lg leading-relaxed text-gray-800">
+            
+            <!-- Section 1 -->
+            <section>
+                <h2 class="text-xl font-bold text-black mb-6 uppercase tracking-widest text-orange-600">01 // The Engagement</h2>
+                <p class="mb-4">By engaging Roam ("Agency") for retention engineering services, the Client agrees to the terms outlined herein. Our engagement model is built on 90-day strategic sprints designed to maximize Customer Lifetime Value (LTV).</p>
+                <p>We do not sell hours; we sell outcomes. All intellectual property developed during the engagement remains the property of the Client upon full payment.</p>
+            </section>
+
+            <!-- Section 2 -->
+            <section>
+                <h2 class="text-xl font-bold text-black mb-6 uppercase tracking-widest text-orange-600">02 // Payment & Billing</h2>
+                <p class="mb-4">Services are billed on a monthly retainer basis or a performance-based hybrid model, as specified in your specific Master Services Agreement (MSA).</p>
+                <ul class="legal-list text-gray-600 text-base">
+                    <li>Invoices are issued on the 1st of the month.</li>
+                    <li>Payment terms are Net-15 unless otherwise agreed.</li>
+                    <li>Late payments may incur a 1.5% interest charge per month.</li>
+                </ul>
+            </section>
+
+            <!-- Section 3 -->
+            <section>
+                <h2 class="text-xl font-bold text-black mb-6 uppercase tracking-widest text-orange-600">03 // Confidentiality</h2>
+                <p>We treat your data like classified intelligence. Roam agrees to keep all Client data, metrics, and customer lists strictly confidential. We will not share, sell, or disclose your proprietary information to any third party without express written consent.</p>
+            </section>
+
+            <!-- Section 4 -->
+            <section>
+                <h2 class="text-xl font-bold text-black mb-6 uppercase tracking-widest text-orange-600">04 // Limitation of Liability</h2>
+                <p>While we engineer systems for growth, market conditions are variable. Roam is not liable for:</p>
+                <ul class="legal-list text-gray-600 text-base mt-4">
+                    <li>Platform outages (Shopify, Klaviyo, Attentive).</li>
+                    <li>Ad account bans or restrictions by third-party networks.</li>
+                    <li>Lost revenue due to factors outside our direct control.</li>
+                </ul>
+            </section>
+
+            <!-- Section 5 -->
+            <section>
+                <h2 class="text-xl font-bold text-black mb-6 uppercase tracking-widest text-orange-600">05 // Termination</h2>
+                <p>We believe in earning our keep. Either party may terminate the agreement with 30 days' written notice after the initial 90-day sprint. Upon termination, Roam will ensure a smooth handover of all assets and credentials.</p>
+            </section>
+
+            <!-- Contact Footer -->
+            <section class="border-t border-black/10 pt-10 mt-12">
+                <p class="text-sm text-gray-500 mb-2">For legal correspondence:</p>
+                <a href="mailto:legal@roam.com" class="text-xl font-bold hover:text-orange-600 transition-colors">legal@roam.com</a>
+            </section>
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-black/5 text-center">
+        <div class="flex justify-center gap-8 mb-8 text-sm font-bold uppercase tracking-widest text-gray-400">
+            <a href="index.html" class="hover:text-orange-600 transition-colors">Home</a>
+            <a href="apply.html" class="hover:text-orange-600 transition-colors">Apply</a>
+            <a href="privacy.html" class="hover:text-orange-600 transition-colors">Privacy</a>
+        </div>
+        <p class="text-gray-400 text-xs uppercase tracking-widest">&copy; 2025 Roam Inc. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

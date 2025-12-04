@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Protocol | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --bg-charcoal: #121212;
+            --accent-orange: #EB5E28;
+            --border-dark: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--bg-cream);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HIGH END INPUTS --- */
+        .input-tech {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-dark);
+            color: white;
+            padding: 1rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 0.95rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+        
+        .input-tech:focus {
+            border-color: var(--accent-orange);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 1px var(--accent-orange);
+        }
+
+        .input-tech::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.6rem;
+            color: #888;
+        }
+
+        /* --- CUSTOM ORANGE ARROW --- */
+        .select-wrapper {
+            position: relative;
+        }
+        
+        select.input-tech {
+            appearance: none; 
+            -webkit-appearance: none;
+            cursor: pointer;
+            padding-right: 2.5rem; 
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EB5E28' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cpolyline points='19 12 12 19 5 12'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* --- SERVICE TOGGLE CHIPS --- */
+        .service-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .service-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .service-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-dark);
+            border-radius: 2rem; 
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.1s ease-out; 
+            user-select: none;
+        }
+
+        .service-chip:hover {
+            border-color: rgba(235, 94, 40, 0.5);
+            color: white;
+        }
+
+        .service-checkbox:checked + .service-chip {
+            background-color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: white;
+            box-shadow: 0 4px 12px rgba(235, 94, 40, 0.3);
+        }
+
+        /* Button */
+        .btn-submit {
+            background-color: var(--accent-orange);
+            color: white;
+            width: 100%;
+            padding: 1.25rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-submit:hover {
+            background-color: #ff6b35;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(235, 94, 40, 0.5);
+        }
+
+        /* Layout */
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+        }
+        @media (min-width: 1024px) {
+            .split-container { grid-template-columns: 0.8fr 1.2fr; }
+        }
+
+        .left-panel {
+            background-color: var(--bg-cream);
+            color: var(--bg-black);
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-video {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            object-fit: cover;
+            opacity: 0.08;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .right-panel {
+            padding: 4rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 768px) { .right-panel { padding: 4rem; } }
+
+        .form-max-width { width: 100%; max-width: 700px; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-black); }
+        ::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50 lg:hidden bg-black/90 backdrop-blur">
+        <a href="index.html" class="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            <span class="w-3 h-3 bg-orange-600 rounded-full"></span>
+            Roam.
+        </a>
+    </nav>
+
+    <div class="split-container">
+        
+        <!-- Left Panel: Context & Standards -->
+        <div class="left-panel">
+            <a href="index.html" class="hidden lg:flex text-3xl font-extrabold tracking-tight text-black items-center gap-2 mb-12">
+                <span class="w-4 h-4 bg-orange-600 rounded-full"></span>
+                Roam.
+            </a>
+
+            <div class="relative z-10 pt-20 lg:pt-0">
+                <span class="text-orange-600 font-bold tracking-widest uppercase text-xs mb-6 block">Application Protocol</span>
+                <h1 class="text-5xl md:text-6xl font-extrabold mb-8 tracking-tighter leading-tight">
+                    Engineering <br>Over Luck.
+                </h1>
+                <p class="text-lg text-gray-600 mb-10 max-w-md leading-relaxed font-medium">
+                    We partner with brands that have already found their signal and are ready to amplify it. Our infrastructure is designed for high-velocity environments.
+                </p>
+                
+                <div class="space-y-8 border-t border-black/10 pt-10">
+                    <div class="flex items-start gap-4">
+                        <span class="text-orange-600 font-mono font-bold mt-1">01</span>
+                        <div>
+                            <h4 class="font-bold text-black text-sm uppercase tracking-wide">Scale Threshold</h4>
+                            <p class="text-gray-500 text-sm mt-1 leading-relaxed">Our predictive models require data volume. We work exclusively with brands generating <strong>$5M+ GMV</strong> annually.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <span class="text-orange-600 font-mono font-bold mt-1">02</span>
+                        <div>
+                            <h4 class="font-bold text-black text-sm uppercase tracking-wide">Infrastructure</h4>
+                            <p class="text-gray-500 text-sm mt-1 leading-relaxed">We deploy natively on Shopify Plus, Klaviyo, and Attentive. We focus on modern stacks for maximum speed.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative z-10 mt-12 hidden lg:block">
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400">&copy; 2025 Roam Inc.</p>
+            </div>
+
+            <video class="panel-video" autoplay muted loop playsinline>
+                <source src="https://videos.pexels.com/video-files/2816936/2816936-hd_1920_1080_24fps.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Right Panel: The Intake Form -->
+        <div class="right-panel">
+            <div class="form-max-width">
+                <div class="mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-2">Request Audit Access</h2>
+                    <p class="text-gray-500 text-sm">Tell us about your current trajectory. Our engineering team reviews all applications within 24 hours.</p>
+                </div>
+
+                <form class="space-y-8" name="application" method="POST" data-netlify="true">
+                    <input type="hidden" name="form-name" value="application" />
+                    
+                    <!-- Identity -->
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="input-label">First Name</label>
+                                <input type="text" name="first-name" class="input-tech" placeholder="First" required>
+                            </div>
+                            <div>
+                                <label class="input-label">Last Name</label>
+                                <input type="text" name="last-name" class="input-tech" placeholder="Last" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="input-label">Work Email</label>
+                                <input type="email" name="email" class="input-tech" placeholder="name@company.com" required>
+                            </div>
+                            <div>
+                                <label class="input-label">Job Title</label>
+                                <input type="text" name="job-title" class="input-tech" placeholder="e.g. Founder, CMO" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Info -->
+                    <div class="space-y-6 pt-4 border-t border-white/5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="input-label">Company Name</label>
+                                <input type="text" name="company-name" class="input-tech" required>
+                            </div>
+                            <div>
+                                <label class="input-label">Website URL</label>
+                                <input type="url" name="website" class="input-tech" placeholder="https://" required>
+                            </div>
+                        </div>
+
+                        <!-- Qualification -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="input-label">Company Type</label>
+                                <div class="select-wrapper">
+                                    <select name="company-type" class="input-tech" required>
+                                        <option value="" disabled selected>Select Type</option>
+                                        <option value="dtc">DTC / Ecommerce</option>
+                                        <option value="saas">SaaS / Tech</option>
+                                        <option value="b2b">B2B Services</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="input-label">Annual Revenue (GMV)</label>
+                                <div class="select-wrapper">
+                                    <select name="revenue" class="input-tech" required>
+                                        <option value="" disabled selected>Select Range</option>
+                                        <option value="under_5m">< $5M (Waitlist)</option>
+                                        <option value="5m_20m">$5M - $20M</option>
+                                        <option value="20m_50m">$20M - $50M</option>
+                                        <option value="50m+">$50M+</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services (Swaggy Toggle Chips) -->
+                    <div class="pt-4 border-t border-white/5">
+                        <label class="input-label mb-3">Service Interests <span class="text-xs text-gray-600 font-normal ml-1">(Select all that apply)</span></label>
+                        <div class="service-grid">
+                            
+                            <label>
+                                <input type="checkbox" name="services" value="Email Architecture" class="service-checkbox">
+                                <span class="service-chip">Email Architecture</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="services" value="SMS / Mobile" class="service-checkbox">
+                                <span class="service-chip">SMS / Mobile</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="services" value="Direct Mail" class="service-checkbox">
+                                <span class="service-chip">Direct Mail</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="services" value="Retention Audit" class="service-checkbox">
+                                <span class="service-chip">Retention Audit</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- Goals & Source -->
+                    <div class="space-y-6 pt-4 border-t border-white/5">
+                        
+                        <!-- Updated Label -->
+                        <div>
+                            <label class="input-label">What are you looking for help with?</label>
+                            <textarea name="goals" class="input-tech" rows="3" placeholder="Tell us about your current challenges and goals..." required></textarea>
+                        </div>
+
+                        <!-- Updated to Text Area -->
+                        <div>
+                            <label class="input-label">How did you hear about us?</label>
+                            <textarea name="source" class="input-tech" rows="2" placeholder="e.g. LinkedIn post, referral from X, etc."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit mt-8">
+                        Submit Application &rarr;
+                    </button>
+
+                    <p class="text-xs text-gray-600 text-center mt-6">
+                        Data handling follows our <a href="privacy.html" class="text-gray-500 hover:text-orange-500 underline transition-colors">Privacy Protocol</a>.
+                    </p>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

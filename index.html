@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restricted Access | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --accent-orange: #EB5E28;
+            --border-color: rgba(0, 0, 0, 0.08);
+        }
+        body {
+            background-color: var(--bg-cream);
+            /* A very subtle, luxurious gradient to give the page depth */
+            background-image: linear-gradient(to bottom right, #FDFCF8, #F7F5F0);
+            color: var(--bg-black);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .login-panel {
+            position: relative;
+            z-index: 10;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 4.5rem 3.5rem;
+            border-radius: 1.25rem;
+            width: 100%;
+            max-width: 460px;
+            text-align: center;
+            /* A softer, more elevated shadow for a premium feel */
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.02),
+                0 20px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        .input-field {
+            background: var(--bg-cream);
+            border: 1px solid var(--border-color);
+            color: var(--bg-black);
+            padding: 1.1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .input-field:focus {
+            border-color: var(--accent-orange);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(235, 94, 40, 0.12);
+            background: #fff;
+        }
+        .input-field::placeholder { 
+            color: #9CA3AF; 
+            font-weight: 400;
+        }
+
+        .btn-action {
+            background-color: var(--accent-orange);
+            color: white;
+            width: 100%;
+            padding: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 0.375rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(235, 94, 40, 0.4);
+            background-color: #E3521D;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 3rem 0;
+            position: relative;
+        }
+        .divider span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #FFFFFF;
+            padding: 0 1.5rem;
+            color: #6B7280;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+        }
+
+        /* The 10/10 Colosseum Brand Mark */
+        .colosseum-icon {
+            color: var(--accent-orange);
+            width: 110px;
+            height: auto;
+            margin: 0 auto 2.5rem auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-panel">
+        
+        <!-- 
+          A highly polished, architectural brand mark. 
+          Geometric, powerful, and built for a premium brand.
+        -->
+        <svg class="colosseum-icon" viewBox="0 0 110 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- The Iconic Ruined Profile -->
+            <path d="M5 62H105" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M10 62V18C10 18 25 14 55 26C85 38 100 34 100 34V62" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            
+            <!-- Architectural Tiers & Arches -->
+            <!-- Ground Level -->
+            <path d="M22 62V44C22 41.7909 23.7909 40 26 40H34C36.2091 40 38 41.7909 38 44V62" stroke="currentColor" stroke-width="2"/>
+            <path d="M51 62V44C51 41.7909 52.7909 40 55 40H63C65.2091 40 67 41.7909 67 44V62" stroke="currentColor" stroke-width="2"/>
+            <path d="M80 62V44C80 41.7909 81.7909 40 84 40H92C94.2091 40 96 41.7909 96 44V62" stroke="currentColor" stroke-width="2"/>
+            
+            <!-- Second Level -->
+            <path d="M10 40H100" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M22 40V26C22 23.7909 23.7909 22 26 22H34C36.2091 22 38 23.7909 38 26V40" stroke="currentColor" stroke-width="2"/>
+            <path d="M51 40V29C51 26.7909 52.7909 25 55 25H63C65.2091 25 67 26.7909 67 29V40" stroke="currentColor" stroke-width="2"/>
+            
+            <!-- Top Attic Level -->
+            <path d="M10 22H45" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="26" y="10" width="8" height="12" stroke="currentColor" stroke-width="2"/>
+        </svg>
+
+        <h1 class="text-4xl font-extrabold tracking-tight mb-3 text-black">Roam.</h1>
+        <p class="text-gray-500 text-sm mb-12 uppercase tracking-widest font-bold">Roam wasn't built in a day.</p>
+
+        <!-- PASSWORD FORM -->
+        <form id="login-form" onsubmit="checkPassword(event)">
+            <input type="password" id="password" class="input-field" placeholder="ACCESS CODE" required>
+            <button type="submit" class="btn-action">Unlock</button>
+            <p id="error-msg" class="text-red-600 text-sm mt-4 hidden font-medium tracking-wide">Access Denied. Please try again.</p>
+        </form>
+
+        <div class="divider"><span>Or Request Entry</span></div>
+
+        <!-- EMAIL SIGNUP FORM (Netlify) -->
+        <div class="text-left">
+            <form name="access-request" method="POST" data-netlify="true">
+                <input type="hidden" name="form-name" value="access-request" />
+                <input type="email" name="email" class="input-field" placeholder="name@company.com" style="text-align: center;" required>
+                <button type="submit" class="btn-action" style="background-color: transparent; border: 2px solid #EB5E28; color: #EB5E28; font-weight: 700;">
+                    Join the Waitlist
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // SIMPLE PASSWORD LOGIC
+        const ACCESS_CODE = "SWAGGY"; 
+
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('password').value;
+            if (input === ACCESS_CODE) {
+                // Redirect to the main homepage
+                window.location.href = "main.html"; 
+            } else {
+                const error = document.getElementById('error-msg');
+                error.classList.remove('hidden');
+                document.getElementById('password').value = '';
+                // Shake effect for incorrect password
+                const panel = document.querySelector('.login-panel');
+                panel.classList.add('animate-shake');
+                setTimeout(() => panel.classList.remove('animate-shake'), 500);
+            }
+        }
+    </script>
+    
+    <!-- Add a subtle shake animation for errors -->
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+    </style>
+
+</body>
+</html>

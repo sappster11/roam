@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roam | Retention Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: High Contrast Luxury */
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --bg-charcoal: #121212;
+            --accent-orange: #EB5E28;
+            --border-color: rgba(5, 5, 5, 0.1);
+            --grid-line: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--bg-black);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography Utilities */
+        .text-display { letter-spacing: -0.04em; line-height: 1; }
+        
+        /* Custom Selection Color */
+        ::selection { background: var(--accent-orange); color: white; }
+
+        /* Animations */
+        .fade-up {
+            animation: fadeUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Interactive Elements */
+        .btn-primary {
+            background-color: var(--accent-orange);
+            color: white;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(235, 94, 40, 0.6);
+        }
+
+        /* Cards */
+        .card-charcoal {
+            background-color: var(--bg-charcoal);
+            color: var(--bg-cream);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .card-charcoal:hover {
+            transform: translateY(-4px);
+            background-color: #171717;
+        }
+
+        /* --- THE BRUTALIST METRICS GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            border-top: 1px solid var(--grid-line);
+            border-left: 1px solid var(--grid-line);
+        }
+        @media (min-width: 768px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+
+        .grid-item {
+            position: relative;
+            padding: 3rem 2rem;
+            border-right: 1px solid var(--grid-line);
+            border-bottom: 1px solid var(--grid-line);
+            background: #000;
+            transition: background 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 240px;
+        }
+        .grid-item:hover { background: #0A0A0A; }
+        .grid-item:hover .metric-value { color: var(--accent-orange); transform: scale(1.02); }
+
+        .metric-value {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.05em;
+            transition: all 0.3s ease;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            font-weight: 600;
+        }
+        .grid-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-orange);
+            border-radius: 50%;
+            margin-bottom: auto;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .grid-item:hover .grid-dot { opacity: 1; box-shadow: 0 0 10px var(--accent-orange); }
+
+        /* Case Study Hover Effect */
+        .case-card {
+            overflow: hidden;
+            border-radius: 0.75rem;
+            position: relative;
+        }
+        .case-card img {
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .group:hover .case-card img {
+            transform: scale(1.05);
+        }
+
+        /* --- EDITORIAL TESTIMONIAL CARDS --- */
+        .review-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+        }
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            border-color: rgba(235, 94, 40, 0.2);
+        }
+        .quote-mark {
+            font-size: 4rem;
+            line-height: 0.5;
+            color: var(--accent-orange);
+            font-family: serif;
+            margin-bottom: 1.5rem;
+            opacity: 0.4;
+        }
+        .avatar-img { filter: grayscale(100%); transition: filter 0.3s ease; }
+        .review-card:hover .avatar-img { filter: grayscale(0%); }
+
+        /* Tech Marquee */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Unified Immersive Section */
+        .immersive-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            min-height: 600px;
+        }
+        .immersive-video {
+            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            width: auto; height: auto; transform: translateX(-50%) translateY(-50%);
+            z-index: 0; object-fit: cover;
+        }
+        .gradient-blend-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 300px;
+            background: linear-gradient(to bottom, var(--bg-cream) 0%, rgba(253, 252, 248, 0.8) 20%, transparent 100%);
+            z-index: 2; pointer-events: none;
+        }
+        .immersive-overlay {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(0,0,0,0.4) 30%, rgba(0,0,0,0.8) 100%);
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;
+        }
+        .immersive-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 5rem;
+            min-height: 600px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-cream); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-black); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300 border-b border-black/5 bg-[#FDFCF8]/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-extrabold tracking-tight text-black flex items-center gap-2">
+                <span class="w-3 h-3 bg-orange-600 rounded-full"></span>
+                Roam.
+            </a>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-900">
+                <a href="#method" class="hover:text-orange-600 transition-colors font-bold">The Method</a>
+                <a href="#work" class="hover:text-orange-600 transition-colors font-bold">Mission Logs</a>
+                <a href="apply.html" class="btn-primary px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-orange-600/20">
+                    Get Audit
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-40 pb-20 md:pt-52 md:pb-32 px-6 max-w-7xl mx-auto border-b border-black/5">
+        <div class="max-w-5xl">
+            <p class="fade-up text-orange-600 font-bold tracking-widest uppercase text-xs mb-6">
+                Retention Engineering
+            </p>
+            <h1 class="fade-up delay-100 text-display text-6xl md:text-8xl lg:text-9xl font-bold text-black mb-10">
+                We Engineer.<br>
+                You <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">Roam.</span>
+            </h1>
+            <div class="fade-up delay-200 flex flex-col md:flex-row gap-8 items-start md:items-center">
+                <p class="text-xl md:text-2xl text-gray-800 max-w-xl leading-relaxed">
+                    We build the predictive infrastructure that maximizes LTV. Stop chasing acquisition. Start owning your retention.
+                </p>
+                <a href="apply.html" class="group flex items-center gap-2 text-lg font-bold border-b-2 border-black pb-1 hover:text-orange-600 hover:border-orange-600 transition-all">
+                    Start the Journey
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Social Proof -->
+    <section class="py-12 border-b border-black/5">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 w-full md:w-auto mb-4 md:mb-0">Powering:</h3>
+            <span class="text-xl font-bold font-serif">VOGUE</span>
+            <span class="text-xl font-bold font-mono">Hypebeast</span>
+            <span class="text-xl font-bold italic">AESOP.</span>
+            <span class="text-xl font-bold tracking-tighter">REVOLVE</span>
+            <span class="text-xl font-bold font-serif">MONOCLE</span>
+        </div>
+    </section>
+
+    <!-- System Compatibility (Marquee) -->
+    <section class="bg-black py-4 border-b border-white/10 overflow-hidden">
+        <div class="marquee-container flex items-center">
+            <div class="marquee-content flex gap-12 text-gray-500 font-mono text-sm font-bold uppercase tracking-widest px-6">
+                <span>System Compatibility:</span>
+                <span>Shopify Plus</span>
+                <span>//</span>
+                <span>Klaviyo</span>
+                <span>//</span>
+                <span>Attentive</span>
+                <span>//</span>
+                <span>Postscript</span>
+                <span>//</span>
+                <span>Recharge</span>
+                <span>//</span>
+                <span>Yotpo</span>
+                <span>//</span>
+                <span>Gorgias</span>
+                <span>//</span>
+                <span>Salesforce</span>
+                <span>//</span>
+                <span>Shopify Plus</span>
+                <span>//</span>
+                <span>Klaviyo</span>
+                <span>//</span>
+                <span>Attentive</span>
+                <span>//</span>
+                <span>Postscript</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRUTALIST METRICS GRID -->
+    <section id="results" class="bg-black text-[#FDFCF8] relative z-20">
+        <div class="max-w-7xl mx-auto px-6 py-24">
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-2 h-2 bg-orange-600 rounded-full"></div>
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-gray-500">Live Performance Data</h2>
+                </div>
+            </div>
+            
+            <div class="grid-container">
+                <div class="grid-item group">
+                    <div class="grid-dot"></div>
+                    <div>
+                        <div class="metric-value">+45%</div>
+                        <div class="metric-label">LTV Uplift</div>
+                    </div>
+                </div>
+                <div class="grid-item group">
+                    <div class="grid-dot"></div>
+                    <div>
+                        <div class="metric-value">91%</div>
+                        <div class="metric-label">Retention Rate</div>
+                    </div>
+                </div>
+                <div class="grid-item group">
+                    <div class="grid-dot"></div>
+                    <div>
+                        <div class="metric-value">7<span class="text-orange-500 text-3xl align-top">d</span></div>
+                        <div class="metric-label">Setup Velocity</div>
+                    </div>
+                </div>
+                <div class="grid-item group">
+                    <div class="grid-dot"></div>
+                    <div>
+                        <div class="metric-value">12<span class="text-orange-500 text-3xl align-top">x</span></div>
+                        <div class="metric-label">ROI Guarantee</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Method -->
+    <section id="method" class="py-24 md:py-32 bg-[#FDFCF8]">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
+                <div>
+                    <h2 class="text-4xl md:text-6xl font-bold mb-6 text-display">The Roam OS.</h2>
+                </div>
+                <div class="flex flex-col items-start justify-end">
+                    <p class="text-lg text-gray-700 mb-8">We replace "marketing campaigns" with engineered loops. Our operating system connects data, messaging, and product experience into a single retention engine.</p>
+                    <a href="apply.html" class="btn-primary px-8 py-4 rounded-full text-base font-bold uppercase tracking-widest">
+                        Deploy The OS
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Cards -->
+                <article class="card-charcoal p-8 rounded-xl flex flex-col relative overflow-hidden group">
+                    <div class="mb-6 text-orange-500">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">01 / Analysis</span>
+                    <h3 class="text-2xl font-bold mb-3 text-white">Predictive Cohorts</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        We segment users not by what they bought, but by what they will buy. Our LTV models predict churn 30 days before it happens.
+                    </p>
+                </article>
+                <article class="card-charcoal p-8 rounded-xl flex flex-col relative overflow-hidden group">
+                    <div class="mb-6 text-orange-500">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">02 / Automation</span>
+                    <h3 class="text-2xl font-bold mb-3 text-white">Zero-Churn Funnels</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Automated, cross-channel win-back sequences that trigger based on usage drops, not just calendar days.
+                    </p>
+                </article>
+                <article class="card-charcoal p-8 rounded-xl flex flex-col relative overflow-hidden group">
+                    <div class="mb-6 text-orange-500">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">03 / Creative</span>
+                    <h3 class="text-2xl font-bold mb-3 text-white">The Creative Layer</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Data tells us 'who' and 'when'. Our creative studio handles the 'what', designing editorial-grade emails and SMS.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Logs -->
+    <section id="work" class="py-24 bg-[#FDFCF8] border-t border-black/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <span class="text-orange-600 font-bold tracking-widest uppercase text-xs mb-4 block">Proven Outcomes</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-black">Mission Logs.</h2>
+                </div>
+                <a href="apply.html" class="hidden md:inline-flex btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest">
+                    Access Full Database
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+                <!-- Case 1 -->
+                <a href="case-study.html" class="group cursor-pointer block">
+                    <div class="case-card h-[450px] mb-6 shadow-xl shadow-black/5">
+                        <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Case Study 1">
+                    </div>
+                    <div class="flex justify-between items-end border-b border-black/10 pb-4">
+                        <div>
+                            <span class="text-xs font-bold text-orange-600 mb-1 block">ECOMMERCE // FASHION</span>
+                            <h4 class="text-2xl font-bold mb-1 text-black">Project: Velvet</h4>
+                            <p class="text-gray-500 text-sm">Automated win-back architecture.</p>
+                        </div>
+                        <span class="text-4xl font-bold text-black">+2.4M</span>
+                    </div>
+                </a>
+
+                <!-- Case 2 -->
+                <div class="group cursor-pointer">
+                    <div class="case-card h-[450px] mb-6 shadow-xl shadow-black/5">
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Case Study 2">
+                    </div>
+                    <div class="flex justify-between items-end border-b border-black/10 pb-4">
+                        <div>
+                            <span class="text-xs font-bold text-orange-600 mb-1 block">SAAS // FINTECH</span>
+                            <h4 class="text-2xl font-bold mb-1 text-black">Project: Iron</h4>
+                            <p class="text-gray-500 text-sm">Predictive churn scoring.</p>
+                        </div>
+                        <span class="text-4xl font-bold text-black">-18%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:hidden text-center">
+                <a href="apply.html" class="btn-primary px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest w-full">
+                    Access Full Database
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Blueprint -->
+    <section class="py-24 bg-black text-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <span class="text-orange-500 font-mono text-xs mb-6 block">00 // THE BLUEPRINT</span>
+                        <h2 class="text-4xl md:text-5xl font-bold leading-tight mb-8">We don't sell hours.<br>We sell outcomes.</h2>
+                        <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                            Most agencies profit when you stay confused. We profit when you grow. Our "Blueprint" is a transparent, data-first engagement model designed to install capability, not dependency.
+                        </p>
+                    </div>
+                    <a href="apply.html" class="btn-primary px-8 py-4 rounded-full text-base font-bold uppercase tracking-widest self-start">
+                        Initialize Audit
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </a>
+                </div>
+                <div class="space-y-12">
+                    <div class="group border-b border-white/10 pb-8">
+                        <span class="text-orange-500 font-mono text-lg mb-2 block">01</span>
+                        <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-500 transition-colors">Audit & Forensics</h3>
+                        <p class="text-gray-500">We tear down your data stack to find the "silent killers" of LTV. No fluff, just forensics.</p>
+                    </div>
+                    <div class="group border-b border-white/10 pb-8">
+                        <span class="text-orange-500 font-mono text-lg mb-2 block">02</span>
+                        <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-500 transition-colors">Infrastructure Build</h3>
+                        <p class="text-gray-500">We install our proprietary flows, segments, and predictive models directly into your stack.</p>
+                    </div>
+                    <div class="group border-b border-white/10 pb-8">
+                        <span class="text-orange-500 font-mono text-lg mb-2 block">03</span>
+                        <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-500 transition-colors">Handover or Scale</h3>
+                        <p class="text-gray-500">We train your team to run it, or we run it for you. Your choice. We build assets, not liabilities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FIELD NOTES: Editorial Layout -->
+    <section class="py-32 bg-[#FDFCF8]">
+        <div class="max-w-7xl mx-auto px-6">
+            <span class="text-orange-600 font-bold tracking-widest uppercase text-xs mb-16 block">Field Notes</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Review Card 1 -->
+                <div class="review-card">
+                    <div class="quote-mark">“</div>
+                    <p class="text-lg font-medium leading-relaxed text-gray-800 mb-8">
+                        Roam isn't an agency. They are special forces for your P&L. They fixed our leaky bucket in 3 weeks and we saw immediate lift.
+                    </p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover avatar-img" alt="Sarah Jenkins">
+                        <div>
+                            <p class="font-bold text-black text-sm">Sarah Jenkins</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">CMO</span>
+                                <span class="text-xs text-gray-300">|</span>
+                                <span class="font-serif font-bold text-gray-800 text-xs tracking-wider">AURA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 2 -->
+                <div class="review-card">
+                    <div class="quote-mark">“</div>
+                    <p class="text-lg font-medium leading-relaxed text-gray-800 mb-8">
+                        The best investment we made this year. We stopped burning cash on acquisition ads and started actually keeping our customers.
+                    </p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover avatar-img" alt="Marcus Cole">
+                        <div>
+                            <p class="font-bold text-black text-sm">Marcus Cole</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Founder</span>
+                                <span class="text-xs text-gray-300">|</span>
+                                <span class="font-mono font-bold text-gray-800 text-xs tracking-wider">KINETIC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 3 -->
+                <div class="review-card">
+                    <div class="quote-mark">“</div>
+                    <p class="text-lg font-medium leading-relaxed text-gray-800 mb-8">
+                        Technical excellence meets creative genius. Roam built flows that outperformed our manual campaigns by 4x.
+                    </p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover avatar-img" alt="Elena Rodriguez">
+                        <div>
+                            <p class="font-bold text-black text-sm">Elena Rodriguez</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">VP Growth</span>
+                                <span class="text-xs text-gray-300">|</span>
+                                <span class="font-sans font-black text-gray-800 text-xs tracking-wider">OMEN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- UNIFIED IMMERSIVE SECTION: Footer Only -->
+    <div class="immersive-wrapper">
+        <video class="immersive-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=2676&auto=format&fit=crop">
+            <source src="https://videos.pexels.com/video-files/2816936/2816936-hd_1920_1080_24fps.mp4" type="video/mp4">
+            <source src="https://videos.pexels.com/video-files/1809623/1809623-hd_1920_1080_25fps.mp4" type="video/mp4">
+        </video>
+
+        <div class="gradient-blend-top"></div>
+        <div class="immersive-overlay"></div>
+
+        <div class="immersive-content max-w-7xl mx-auto px-6 w-full">
+            <!-- Footer -->
+            <footer id="contact" class="w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-20 text-white">
+                    <div>
+                        <h2 class="text-6xl md:text-8xl font-bold mb-8 tracking-tighter">Roam.</h2>
+                        <p class="text-gray-300 text-xl max-w-md mb-10">
+                            The journey to profitability shouldn't be a mystery. We engineer the path.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                             <a href="apply.html" class="btn-primary px-8 py-3 rounded-full text-white font-bold text-center">
+                                 Request Audit &rarr;
+                             </a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col justify-between items-start md:items-end text-white/80">
+                        <div class="flex gap-8 text-sm font-bold uppercase tracking-widest mb-10 md:mb-0">
+                            <a href="terms.html" class="hover:text-white transition-colors">Terms</a>
+                            <a href="privacy.html" class="hover:text-white transition-colors">Privacy</a>
+                            <a href="#" class="hover:text-white transition-colors">LinkedIn</a>
+                            <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                        </div>
+                        <div class="text-right hidden md:block">
+                            <p>&copy; 2025 Roam Inc.</p>
+                            <p class="text-xs mt-2 opacity-50">New York • London • Tokyo</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

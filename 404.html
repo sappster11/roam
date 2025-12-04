@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --accent-orange: #EB5E28;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--bg-cream);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        ::selection { background: var(--accent-orange); color: white; }
+        
+        .error-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video (Reusing the golden grass for continuity) -->
+    <video class="error-video" autoplay muted loop playsinline>
+        <source src="https://videos.pexels.com/video-files/2816936/2816936-hd_1920_1080_24fps.mp4" type="video/mp4">
+    </video>
+
+    <div class="content px-6">
+        <p class="text-orange-500 font-bold tracking-widest uppercase text-sm mb-4">Error 404</p>
+        <h1 class="text-6xl md:text-9xl font-extrabold mb-8 tracking-tighter">Lost Signal.</h1>
+        <p class="text-xl text-gray-400 max-w-md mx-auto mb-10">
+            You've roamed too far off the path. This page doesn't exist in our system.
+        </p>
+        <a href="index.html" class="inline-flex items-center gap-2 bg-orange-600 text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-black transition-all duration-300">
+            Reacquire Signal &rarr;
+        </a>
+    </div>
+
+</body>
+</html>
