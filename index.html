@@ -142,11 +142,12 @@
         }
 
         .colosseum-icon {
-            color: var(--accent-orange);
-            width: 64px; /* Smaller icon */
+            /* Width controls the size of your new image */
+            width: 80px; 
             height: auto;
             margin: 0 auto 1.5rem auto;
             display: block;
+            object-fit: contain;
         }
 
         /* Footer absolutely positioned to bottom so Card remains dead center */
@@ -167,18 +168,14 @@
 
     <div class="login-panel">
         
-        <svg class="colosseum-icon" viewBox="0 0 110 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 62H105" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M10 62V18C10 18 25 14 55 26C85 38 100 34 100 34V62" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-            <path d="M22 62V44C22 41.7909 23.7909 40 26 40H34C36.2091 40 38 41.7909 38 44V62" stroke="currentColor" stroke-width="2"/>
-            <path d="M51 62V44C51 41.7909 52.7909 40 55 40H63C65.2091 40 67 41.7909 67 44V62" stroke="currentColor" stroke-width="2"/>
-            <path d="M80 62V44C80 41.7909 81.7909 40 84 40H92C94.2091 40 96 41.7909 96 44V62" stroke="currentColor" stroke-width="2"/>
-            <path d="M10 40H100" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M22 40V26C22 23.7909 23.7909 22 26 22H34C36.2091 22 38 23.7909 38 26V40" stroke="currentColor" stroke-width="2"/>
-            <path d="M51 40V29C51 26.7909 52.7909 25 55 25H63C65.2091 25 67 26.7909 67 29V40" stroke="currentColor" stroke-width="2"/>
-            <path d="M10 22H45" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="26" y="10" width="8" height="12" stroke="currentColor" stroke-width="2"/>
-        </svg>
+        <!-- 
+            IMAGE SWAP:
+            Make sure your image file is named "roam colloseum.png" 
+            and is in the same folder as this file.
+        -->
+        <img src="roam colloseum.png" 
+             alt="Roam Logo" 
+             class="colosseum-icon">
 
         <h1 class="text-3xl font-extrabold tracking-tight mb-1 text-black">Roam.</h1>
         <p class="text-gray-500 text-[10px] mb-6 uppercase tracking-widest font-bold">Roam wasn't built in a day.</p>
