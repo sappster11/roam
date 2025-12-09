@@ -5,8 +5,9 @@
     metaTitle.content = 'Roam';
     document.head.appendChild(metaTitle);
 
-    // 2. DESKTOP FAVICON (SVG)
-    // This is the "All Orange Circle" for your browser tabs
+    // 2. DESKTOP FAVICON (SVG ONLY)
+    // We leave the Mobile/Favorites icon to your hardcoded HTML tag.
+    // This just handles the nice crisp circle for laptop browsers.
     let iconLink = document.querySelector("link[rel*='icon']") || document.createElement('link');
     iconLink.type = 'image/svg+xml';
     iconLink.rel = 'icon';
