@@ -19,12 +19,14 @@
             background-image: linear-gradient(to bottom right, #FDFCF8, #F7F5F0);
             color: var(--bg-black);
             font-family: 'Inter', sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column; /* Changed to column to allow footer spacing */
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-y: auto; /* Allow scrolling if height is small */
             -webkit-font-smoothing: antialiased;
+            padding: 2rem; /* Add outer padding for mobile */
         }
         
         .login-panel {
@@ -32,10 +34,10 @@
             z-index: 10;
             background: #FFFFFF;
             border: 1px solid var(--border-color);
-            padding: 4.5rem 3.5rem;
+            padding: 5rem 4rem; /* Increased padding */
             border-radius: 1.25rem;
             width: 100%;
-            max-width: 460px;
+            max-width: 480px; /* Slightly wider */
             text-align: center;
             /* A softer, more elevated shadow for a premium feel */
             box-shadow: 
@@ -47,9 +49,9 @@
             background: var(--bg-cream);
             border: 1px solid var(--border-color);
             color: var(--bg-black);
-            padding: 1.1rem;
+            padding: 1.25rem; /* Increased padding */
             width: 100%;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem; /* Increased spacing between inputs */
             border-radius: 0.375rem;
             text-align: center;
             letter-spacing: 0.05em;
@@ -72,7 +74,7 @@
             background-color: var(--accent-orange);
             color: white;
             width: 100%;
-            padding: 1.1rem;
+            padding: 1.25rem; /* Increased padding */
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -80,7 +82,7 @@
             cursor: pointer;
             border-radius: 0.375rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.95rem;
+            font-size: 0.85rem; /* Matches login page text size */
         }
         .btn-action:hover {
             transform: translateY(-2px);
@@ -91,7 +93,7 @@
         .divider {
             height: 1px;
             background: var(--border-color);
-            margin: 3rem 0;
+            margin: 3.5rem 0; /* Increased spacing */
             position: relative;
         }
         .divider span {
@@ -113,7 +115,7 @@
             color: var(--accent-orange);
             width: 110px;
             height: auto;
-            margin: 0 auto 2.5rem auto;
+            margin: 0 auto 3rem auto; /* Increased spacing */
             display: block;
         }
     </style>
@@ -147,14 +149,14 @@
             <rect x="26" y="10" width="8" height="12" stroke="currentColor" stroke-width="2"/>
         </svg>
 
-        <h1 class="text-4xl font-extrabold tracking-tight mb-3 text-black">Roam.</h1>
+        <h1 class="text-4xl font-extrabold tracking-tight mb-4 text-black">Roam.</h1>
         <p class="text-gray-500 text-sm mb-12 uppercase tracking-widest font-bold">Roam wasn't built in a day.</p>
 
         <!-- PASSWORD FORM -->
         <form id="login-form" onsubmit="checkPassword(event)">
             <input type="password" id="password" class="input-field" placeholder="ACCESS CODE" required>
             <button type="submit" class="btn-action">Unlock</button>
-            <p id="error-msg" class="text-red-600 text-sm mt-4 hidden font-medium tracking-wide">Access Denied. Please try again.</p>
+            <p id="error-msg" class="text-red-600 text-sm mt-6 hidden font-medium tracking-wide">Access Denied. Please try again.</p>
         </form>
 
         <div class="divider"><span>Or Request Entry</span></div>
@@ -170,6 +172,11 @@
             </form>
         </div>
     </div>
+
+    <!-- Footer Text matching login.html -->
+    <p class="text-center text-[10px] uppercase tracking-widest text-gray-400 mt-20">
+        Restricted Access Area // Roam Inc. 2025
+    </p>
 
     <script>
         // SIMPLE PASSWORD LOGIC
