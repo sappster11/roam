@@ -136,10 +136,10 @@
                 errorMsg.classList.remove('hidden');
                 btn.innerHTML = 'INITIALIZE SESSION';
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
-            } else {
+           } else {
     console.log("Login successful! Redirecting to portal...");
-    console.log("Redirect URL:", "/portal.html");
-    window.location.href = "/portal.html";
+    console.log("Redirect URL:", "https://goroam.cc/portal.html");
+    window.location.replace("https://goroam.cc/portal.html");
     console.log("After redirect call");
 }
         } catch (err) {
