@@ -137,8 +137,11 @@
                 btn.innerHTML = 'INITIALIZE SESSION';
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
             } else {
-                window.location.href = "/portal.html" 
-            }
+    console.log("Login successful! Redirecting to portal...");
+    console.log("Redirect URL:", "/portal.html");
+    window.location.href = "/portal.html";
+    console.log("After redirect call");
+}
         } catch (err) {
             console.error(err);
             errorMsg.textContent = "SYSTEM FAILURE. CHECK CONSOLE.";
