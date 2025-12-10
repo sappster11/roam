@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-sidebar: #050505;
+            --accent-orange: #EB5E28;
+            --border-light: rgba(0,0,0,0.05);
+            --border-dark: rgba(255,255,255,0.1);
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-cream);
+            color: #111;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* --- MOBILE OVERLAY (High Z-Index) --- */
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 40; /* Behind sidebar, above content */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+        .mobile-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* --- SIDEBAR --- */
+        aside {
+            background-color: var(--bg-sidebar);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            border-right: 1px solid var(--border-dark);
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 50; /* Top level */
+            height: 100%;
+        }
+
+        /* Desktop: Default Width */
+        @media (min-width: 1024px) {
+            aside {
+                width: var(--sidebar-width);
+                transform: translateX(0) !important; /* Always visible */
+            }
+            /* Desktop Collapsed Variant */
+            aside.desktop-collapsed {
+                width: var(--sidebar-collapsed-width);
+                padding: 1.5rem 1rem;
+            }
+            aside.desktop-collapsed .logo-text,
+            aside.desktop-collapsed .nav-label,
+            aside.desktop-collapsed .user-info,
+            aside.desktop-collapsed .group-label {
+                display: none;
+                opacity: 0;
+            }
+            aside.desktop-collapsed .nav-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            aside.desktop-collapsed .nav-item i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            aside.desktop-collapsed .sidebar-toggle i {
+                transform: rotate(180deg);
+            }
+        }
+
+        /* Mobile: Off-Canvas Logic */
+        @media (max-width: 1024px) {
+            aside {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 280px;
+                transform: translateX(-100%); /* Start Hidden */
+            }
+            aside.mobile-open {
+                transform: translateX(0); /* Slide In */
+                box-shadow: 10px 0 50px rgba(0,0,0,0.5);
+            }
+            /* Hide the desktop toggle button on mobile */
+            .sidebar-toggle { display: none !important; }
+        }
+
+        /* Desktop Toggle Button */
+        .sidebar-toggle {
+            position: absolute;
+            right: -12px;
+            top: 48px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid var(--bg-sidebar);
+            color: white;
+            font-size: 12px;
+            transition: transform 0.3s;
+            z-index: 60;
+        }
+
+        /* Nav Items */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #999;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+        .nav-item.active {
+            background-color: rgba(235, 94, 40, 0.15);
+            color: var(--accent-orange);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+        .nav-item i { width: 24px; margin-right: 12px; flex-shrink: 0; }
+
+        /* Content Area */
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem 3rem;
+            width: 100%;
+            position: relative;
+        }
+        @media (max-width: 768px) { main { padding: 1.5rem; } }
+
+        /* Headers */
+        .mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        @media (max-width: 1024px) { .mobile-header { display: flex; } }
+
+        header.desktop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        @media (max-width: 1024px) { header.desktop-header { display: none; } }
+
+        /* Rest of Styles */
+        .card { background: #fff; border: 1px solid var(--border-light); border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666; font-weight: 700; }
+        .metric-sub { font-size: 0.75rem; color: #999; margin-top: 0.25rem; }
+        .text-green { color: #10B981; }
+        .text-red { color: #EF4444; }
+        .priority-box { background: #050505; color: #fff; padding: 2rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; }
+        .priority-bg-icon { position: absolute; right: -10px; bottom: -20px; font-size: 8rem; color: #ffffff; opacity: 0.05; pointer-events: none; z-index: 0; transform: rotate(-15deg); }
+        
+        /* New Components */
+        .cal-mini-item { display: flex; align-items: flex-start; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+        .cal-mini-item:last-child { border-bottom: none; }
+        .cal-date-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.25rem 0.5rem; text-align: center; margin-right: 1rem; min-width: 50px; }
+        .cal-month { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: #888; display: block; }
+        .cal-day { font-size: 1.1rem; font-weight: 800; color: #111; line-height: 1; }
+        details.faq-item { border-bottom: 1px solid #f3f4f6; padding: 1rem 0; }
+        details.faq-item:last-child { border-bottom: none; }
+        summary { font-weight: 600; font-size: 0.9rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        summary::-webkit-details-marker { display: none; }
+        .faq-answer { font-size: 0.85rem; color: #666; line-height: 1.5; padding-top: 0.5rem; }
+
+        /* Asset Link */
+        .mini-resource {
+            display: flex; align-items: center; padding: 0.75rem; border-bottom: 1px solid #f3f4f6; transition: background 0.2s; text-decoration: none; border-radius: 0.375rem;
+        }
+        .mini-resource:hover { background: #f9fafb; }
+        .mini-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #666; border-radius: 4px; margin-right: 0.75rem; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <!-- Desktop Toggle -->
+        <div class="sidebar-toggle" onclick="toggleDesktopSidebar()">
+            <i class="fa-solid fa-chevron-left"></i>
+        </div>
+
+        <!-- Mobile Close Button -->
+        <div class="mb-10 flex items-center justify-between px-2">
+            <div class="flex items-center gap-3">
+                <span class="w-4 h-4 bg-orange-600 rounded-full flex-shrink-0"></span>
+                <span class="text-xl font-bold tracking-tight text-white logo-text">Roam.</span>
+            </div>
+            <button onclick="toggleMobileSidebar()" class="lg:hidden text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto">
+            <p class="text-xs font-bold text-gray-600 uppercase tracking-widest mb-4 px-3 group-label">Intelligence</p>
+            <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> <span class="nav-label">Dashboard</span></a>
+            <a href="portal-intelligence.html" class="nav-item"><i class="fa-solid fa-magnifying-glass-chart"></i> <span class="nav-label">Deep Dive</span></a>
+            
+            <p class="text-xs font-bold text-gray-600 uppercase tracking-widest mb-4 px-3 mt-8 group-label">Operations</p>
+            <a href="portal-operations.html" class="nav-item"><i class="fa-solid fa-list-check"></i> <span class="nav-label">Project Status</span></a>
+            <a href="portal-assets.html" class="nav-item"><i class="fa-solid fa-folder-tree"></i> <span class="nav-label">Asset Vault</span></a>
+            <a href="portal-billing.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="nav-label">Billing</span></a>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-white/10">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">VC</div>
+                <div class="user-info overflow-hidden">
+                    <p class="text-sm font-medium text-white truncate">Velvet Clothing</p>
+                    <p class="text-xs text-gray-500">Enterprise Plan</p>
+                </div>
+            </div>
+            <a href="main.html" class="block mt-4 text-xs text-red-400 hover:text-red-300 ml-2 user-info">Sign Out</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+        
+        <!-- Mobile Header (Visible < 1024px) -->
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-orange-600"></div>
+        </div>
+
+        <!-- Desktop Header (Visible >= 1024px) -->
+        <header class="desktop-header">
+            <div>
+                <h1 class="text-3xl font-bold text-black mb-1">Command Center</h1>
+                <p class="text-gray-500 text-sm">Retention telemetry. Last sync: 14 mins ago.</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition">
+                    Last 30 Days
+                </button>
+                <button class="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition">
+                    Export Report
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card">
+                <p class="metric-label">Total Revenue</p>
+                <p class="metric-value">$842,050</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">Source: Shopify</span>
+                    <p class="metric-change text-green"><i class="fa-solid fa-arrow-trend-up"></i> +12% YoY</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="metric-label text-orange-600">Attributed Revenue</p>
+                <p class="metric-value text-black">$341,200</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs font-bold bg-orange-50 text-orange-600 px-2 py-0.5 rounded border border-orange-100">40.5% of Total</span>
+                    <p class="metric-change text-green"><i class="fa-solid fa-arrow-trend-up"></i> +15% YoY</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="metric-label">Campaigns Sent</p>
+                <p class="metric-value">14</p>
+                <div class="flex flex-col gap-1 mt-1">
+                    <p class="metric-change text-green text-xs"><i class="fa-solid fa-arrow-up"></i> +2 vs last month</p>
+                    <p class="metric-change text-green text-xs"><i class="fa-solid fa-arrow-up"></i> +24% YoY</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Section: Chart + Schedule -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Revenue Chart -->
+            <div class="card lg:col-span-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-black">Revenue Mix (Campaigns vs Flows)</h3>
+                    <div class="flex gap-3 text-xs">
+                        <span class="flex items-center text-gray-500"><span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span>Campaigns</span>
+                        <span class="flex items-center text-gray-500"><span class="w-2 h-2 rounded-full bg-gray-800 mr-2"></span>Flows</span>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- NEW: Upcoming Schedule -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-black">Up Next</h3>
+                    <a href="portal-calendar.html" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">Full Calendar &rarr;</a>
+                </div>
+                <div class="flex flex-col gap-0">
+                    <div class="cal-mini-item">
+                        <div class="cal-date-box">
+                            <span class="cal-month">NOV</span>
+                            <span class="cal-day">11</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-black">Flash Sale</p>
+                            <span class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded uppercase">SMS Drop</span>
+                        </div>
+                    </div>
+                    <div class="cal-mini-item">
+                        <div class="cal-date-box">
+                            <span class="cal-month">NOV</span>
+                            <span class="cal-day">14</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-black">Black Friday Tease</p>
+                            <span class="text-[10px] font-bold bg-gray-100 text-gray-700 px-2 py-0.5 rounded uppercase">Email</span>
+                        </div>
+                    </div>
+                    <div class="cal-mini-item">
+                        <div class="cal-date-box">
+                            <span class="cal-month">NOV</span>
+                            <span class="cal-day">18</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-black">VIP Early Access</p>
+                            <span class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded uppercase">SMS Drop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section: FAQ & Priority & Quick Links -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-10">
+            
+            <!-- NEW: Quick Resources -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-black">Quick Links</h3>
+                    <a href="portal-assets.html" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">View All</a>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <a href="https://docs.google.com" target="_blank" class="mini-resource">
+                        <div class="mini-icon text-blue-600 bg-blue-50"><i class="fa-solid fa-file-lines"></i></div>
+                        <div>
+                            <p class="text-sm font-bold text-black">Strategy Deck</p>
+                            <p class="text-xs text-gray-500">Google Slides</p>
+                        </div>
+                    </a>
+                    <a href="https://sheets.google.com" target="_blank" class="mini-resource">
+                        <div class="mini-icon text-green-600 bg-green-50"><i class="fa-solid fa-table"></i></div>
+                        <div>
+                            <p class="text-sm font-bold text-black">Audit Sheet</p>
+                            <p class="text-xs text-gray-500">Google Sheets</p>
+                        </div>
+                    </a>
+                    <a href="https://drive.google.com" target="_blank" class="mini-resource">
+                        <div class="mini-icon text-gray-600 bg-gray-100"><i class="fa-solid fa-folder"></i></div>
+                        <div>
+                            <p class="text-sm font-bold text-black">Creative Assets</p>
+                            <p class="text-xs text-gray-500">Google Drive</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- NEW: Support / FAQ -->
+            <div class="card">
+                <h3 class="font-bold text-black mb-4">Quick Support</h3>
+                <div class="space-y-1">
+                    <details class="faq-item group">
+                        <summary class="flex justify-between items-center p-2 rounded hover:bg-gray-50">
+                            <span>How do I approve copy?</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                        </summary>
+                        <div class="faq-answer p-2">
+                            All copy decks are in the "Asset Vault". Comment directly to approve.
+                        </div>
+                    </details>
+                    <details class="faq-item group">
+                        <summary class="flex justify-between items-center p-2 rounded hover:bg-gray-50">
+                            <span>Where are my invoices?</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                        </summary>
+                        <div class="faq-answer p-2">
+                            Navigate to the "Billing" tab on the sidebar.
+                        </div>
+                    </details>
+                    <details class="faq-item group">
+                        <summary class="flex justify-between items-center p-2 rounded hover:bg-gray-50">
+                            <span>Attribution logic?</span>
+                            <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                        </summary>
+                        <div class="faq-answer p-2">
+                            We use a 5-day click / 1-day view window.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Priority Outreach -->
+            <div class="priority-box flex flex-col justify-between h-full">
+                <div class="relative z-10 w-full">
+                    <h3 class="text-xl font-bold mb-2">Priority Line</h3>
+                    <p class="text-gray-400 text-sm mb-6">Direct access to your Lead Architect.</p>
+                    <div class="flex flex-col gap-3">
+                        <a href="mailto:support@roam.com" class="bg-white text-black px-5 py-3 rounded font-bold text-sm hover:bg-gray-200 transition text-center">Email Lead</a>
+                        <a href="#" class="border border-white/20 text-white px-5 py-3 rounded font-bold text-sm hover:bg-white/10 transition text-center">Slack Channel</a>
+                    </div>
+                </div>
+                <i class="fa-brands fa-slack priority-bg-icon"></i>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // SEPARATE LOGIC FOR MOBILE AND DESKTOP TOGGLES
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        function toggleDesktopSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('desktop-collapsed');
+        }
+
+        // Initialize Chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                datasets: [{
+                    label: 'Campaigns',
+                    data: [45000, 52000, 49000, 60000, 58000, 75000],
+                    backgroundColor: '#EB5E28',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Flows',
+                    data: [20000, 25000, 28000, 32000, 35000, 42000],
+                    backgroundColor: '#1f2937',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] }, ticks: { color: '#94a3b8', font: {family: 'Inter'} }, stacked: true },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: {family: 'Inter'} }, stacked: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
