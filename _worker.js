@@ -3,30 +3,16 @@ export default {
     const url = new URL(request.url)
     
     // Pages that require login
-    const protectedPaths = ['/portal', '/client-dashboard']
-    const isProtected = protectedPaths.some(path => url.pathname === path || url.pathname.startsWith(path.replace('.html', '')))
+    const protectedPaths = ['/portal']
+    const isProtected = protectedPaths.some(path => url.pathname === path || url.pathname.startsWith(path))
     
     if (isProtected) {
-      // Check for Supabase session cookie
+      // Check for the exact Supabase cookie
       const cookies = request.headers.get('Cookie') || ''
-      const sessionMatch = cookies.match(/sb-[^-]+-auth-token=([^;]+)/)
+      const hasSession = cookies.includes('sb-rtmewagtvmubpushnzag-auth-token')
       
-      if (!sessionMatch) {
-        return Response.redirect(new URL('/login.html', request.url), 302)
-      }
-      
-      const token = sessionMatch[1]
-      
-      // Verify with Supabase
-      const verifyResponse = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'apikey': env.SUPABASE_ANON_KEY
-        }
-      })
-      
-      if (!verifyResponse.ok) {
-        return Response.redirect(new URL('/login.html', request.url), 302)
+      if (!hasSession) {
+        return Response.redirect(new URL('/login', request.url), 302)
       }
     }
     
