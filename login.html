@@ -112,8 +112,27 @@
     <script>
       const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
-      const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
-
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    flowType: 'pkce',
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: {
+      getItem: (key) => {
+        const cookies = document.cookie.split(';')
+        const cookie = cookies.find(c => c.trim().startsWith(key + '='))
+        return cookie ? decodeURIComponent(cookie.split('=')[1]) : null
+      },
+      setItem: (key, value) => {
+        document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
+      },
+      removeItem: (key) => {
+        document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+      }
+    }
+  }
+})
       async function handleLogin() {
         const email = document.getElementById('email').value
         const password = document.getElementById('password').value
