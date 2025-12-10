@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Access | Roam</title>
- <script src="favicon.js"></script>
+    <script src="favicon.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Palette: High Contrast Luxury */
             --bg-cream: #FDFCF8;
             --bg-black: #050505;
             --accent-orange: #EB5E28;
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-cream); /* Cream Background */
-            color: var(--bg-black);           /* Dark Text */
+            background-color: var(--bg-cream);
+            color: var(--bg-black);
         }
         .btn-primary {
             background-color: var(--accent-orange);
@@ -28,7 +27,6 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 30px -10px rgba(235, 94, 40, 0.6);
         }
-        /* Custom input autofill styling for light mode */
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus, 
@@ -40,12 +38,10 @@
 </head>
 <body class="min-h-screen flex flex-col relative overflow-hidden">
     
-    <!-- Background Texture (Subtle Grid) -->
     <div class="absolute inset-0 z-0 opacity-40" 
          style="background-image: radial-gradient(#d4d4d4 1px, transparent 1px); background-size: 24px 24px;">
     </div>
 
-    <!-- Navigation (Minimal) -->
     <nav class="w-full p-6 z-10 flex justify-between items-center">
         <a href="main.html" class="text-xl font-extrabold tracking-tight text-black flex items-center gap-2 hover:opacity-70 transition-opacity">
             <span class="w-2 h-2 bg-orange-600 rounded-full"></span>
@@ -56,20 +52,16 @@
         </a>
     </nav>
 
-    <!-- Main Content -->
     <main class="flex-grow flex items-center justify-center p-6 pb-20 z-10">
         <div class="w-full max-w-md">
             
-            <!-- Header -->
             <div class="mb-10 text-center">
                 <p class="text-orange-600 font-mono text-xs mb-4 animate-pulse">:: SYSTEM ENTRY ::</p>
                 <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-2 text-black">Welcome Back.</h1>
                 <p class="text-gray-600">Enter your credentials to access the OS.</p>
             </div>
 
-            <!-- Card -->
             <div class="bg-white border border-black/5 p-8 md:p-10 rounded-xl shadow-2xl shadow-gray-200/50 relative overflow-hidden group">
-                <!-- Decorative line -->
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-600 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
 
                 <div class="space-y-6">
@@ -87,9 +79,19 @@
                             placeholder="••••••••">
                     </div>
 
-                    <!-- Button with updated spacing -->
                     <button type="button" onclick="handleLogin()" class="w-full btn-primary py-4 text-xs font-bold uppercase tracking-widest rounded-sm">
                         Initialize Session
+                    </button>
+
+                    <div class="flex items-center gap-4 my-6">
+                        <div class="flex-1 h-px bg-gray-200"></div>
+                        <span class="text-xs text-gray-400 uppercase">or</span>
+                        <div class="flex-1 h-px bg-gray-200"></div>
+                    </div>
+
+                    <button type="button" onclick="signInWithGoogle()" class="w-full bg-white border border-gray-300 text-gray-700 py-4 text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-gray-50 flex items-center justify-center gap-3">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-4 h-4">
+                        Sign in with Google
                     </button>
                 </div>
 
@@ -107,75 +109,86 @@
         </div>
     </main>
 
-    <!-- Supabase Integration -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
-      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    flowType: 'pkce',
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    storage: {
-      getItem: (key) => {
-        const cookies = document.cookie.split(';')
-        const cookie = cookies.find(c => c.trim().startsWith(key + '='))
-        return cookie ? decodeURIComponent(cookie.split('=')[1]) : null
-      },
-      setItem: (key, value) => {
-        document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
-      },
-      removeItem: (key) => {
-        document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
-      }
-    }
-  }
-})
-      async function handleLogin() {
-        const email = document.getElementById('email').value
-        const password = document.getElementById('password').value
-        const errorMsg = document.getElementById('login-error');
-        const btn = document.querySelector('button');
-        
-        // Reset UI
-        errorMsg.classList.add('hidden');
-        btn.innerHTML = 'AUTHENTICATING...';
-        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
 
-        try {
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            })
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                flowType: 'pkce',
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true,
+                storage: {
+                    getItem: (key) => {
+                        const cookies = document.cookie.split(';')
+                        const cookie = cookies.find(c => c.trim().startsWith(key + '='))
+                        return cookie ? decodeURIComponent(cookie.split('=')[1]) : null
+                    },
+                    setItem: (key, value) => {
+                        document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
+                    },
+                    removeItem: (key) => {
+                        document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                    }
+                }
+            }
+        })
 
-            if (error) {
-                errorMsg.textContent = "ACCESS DENIED: " + error.message;
+        async function handleLogin() {
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            const errorMsg = document.getElementById('login-error');
+            const btn = document.querySelector('button');
+            
+            errorMsg.classList.add('hidden');
+            btn.innerHTML = 'AUTHENTICATING...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                const { data, error } = await _supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                })
+
+                if (error) {
+                    errorMsg.textContent = "ACCESS DENIED: " + error.message;
+                    errorMsg.classList.remove('hidden');
+                    btn.innerHTML = 'INITIALIZE SESSION';
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                } else {
+                    console.log("Login successful! Redirecting to portal...");
+                    window.location.replace("https://goroam.cc/portal.html");
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = "SYSTEM FAILURE. CHECK CONSOLE.";
                 errorMsg.classList.remove('hidden');
                 btn.innerHTML = 'INITIALIZE SESSION';
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
-           } else {
-    console.log("Login successful! Redirecting to portal...");
-    console.log("Redirect URL:", "https://goroam.cc/portal.html");
-    window.location.replace("https://goroam.cc/portal.html");
-    console.log("After redirect call");
-}
-        } catch (err) {
-            console.error(err);
-            errorMsg.textContent = "SYSTEM FAILURE. CHECK CONSOLE.";
-            errorMsg.classList.remove('hidden');
-            btn.innerHTML = 'INITIALIZE SESSION';
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
         }
-      }
 
-      // Allow "Enter" key to submit
-      document.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            handleLogin();
+        async function signInWithGoogle() {
+            const { data, error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: 'https://goroam.cc/portal'
+                }
+            })
+            
+            if (error) {
+                console.error('Google sign-in error:', error)
+                alert('Error signing in with Google')
+            }
         }
-      });
+
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
     </script>
 </body>
 </html>
