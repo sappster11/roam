@@ -3,7 +3,7 @@ export default {
     const url = new URL(request.url)
     
     // Pages that require login
-    const protectedPaths = ['/application.html', '/main.html']
+    const protectedPaths = ['/portal', '/client-dashboard']
     const isProtected = protectedPaths.some(path => url.pathname === path || url.pathname.startsWith(path.replace('.html', '')))
     
     if (isProtected) {
