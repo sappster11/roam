@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scope | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+    <style>
+        /* --- PAGE-SPECIFIC SCOPE STYLES --- */
+        .scope-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            margin-bottom: 2rem;
+        }
+
+        .scope-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .scope-item {
+            margin-bottom: 1.5rem;
+        }
+        .scope-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #111;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .scope-title i {
+            color: var(--accent-orange);
+            margin-right: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .sub-list {
+            list-style: disc;
+            padding-left: 1.5rem;
+            margin: 0;
+        }
+        .sub-item {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .scope-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 800px;
+        }
+        .scope-table th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .scope-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: #1f2937;
+            font-size: 0.9rem;
+        }
+        .scope-table tr:last-child td {
+            border-bottom: none;
+        }
+        .text-numeric {
+            font-family: 'Inter', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        .bg-total {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        .status-positive { color: #166534; font-weight: 600; background-color: #f0fdf4; display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid #bbf7d0; }
+        .status-neutral { color: #854d0e; font-weight: 600; background-color: #fefce8; display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid #fef08a; }
+        .status-negative { color: #991b1b; font-weight: 600; background-color: #fef2f2; display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body data-page="scope">
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen pt-8 px-8"> 
+        
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header">
+            <div>
+                <h1 class="text-3xl font-bold text-black">Scope Tracker</h1>
+                <p class="text-xs text-gray-500 mt-1">Contract: Enterprise Retainer Q4</p>
+            </div>
+            <div class="flex items-center gap-4 h-10">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-sm" title="Sync Status: Active">
+                    <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)] animate-pulse"></div>
+                    <span class="text-xs font-bold text-gray-600">Automatic Sync Enabled</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Area -->
+        <div class="flex-grow overflow-y-auto pb-10">
+            
+            <!-- Revision Policy Banner -->
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+                <div>
+                    <h3 class="text-sm font-bold text-blue-800">Revision Policy</h3>
+                    <p class="text-xs text-blue-600 mt-1">Each asset delivered is entitled to up to 2 rounds of revisions within scope.</p>
+                </div>
+            </div>
+
+            <!-- 1. Scope Overview -->
+            <div class="scope-card">
+                <h2 class="text-lg font-bold mb-6 pb-4 border-b border-gray-100">Deliverables Overview</h2>
+                <ul class="scope-list grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <li class="scope-item">
+                        <div class="scope-title"><i class="fa-solid fa-compass"></i> Strategic Planning & Guidance</div>
+                        <ul class="sub-list">
+                            <li class="sub-item">Flow roadmap with prioritized triggers, timing, and segmentation</li>
+                            <li class="sub-item">Journey mapping across email, SMS, and list growth</li>
+                            <li class="sub-item">Campaign strategy and planning with Roam managing messaging, cadence, and targeting</li>
+                        </ul>
+                    </li>
+                    <li class="scope-item">
+                        <div class="scope-title"><i class="fa-solid fa-pen-nib"></i> Creative Development & Execution</div>
+                        <ul class="sub-list">
+                            <li class="sub-item">Up to 15 emails/month and 8 SMS/month (flows + campaigns)</li>
+                            <li class="sub-item">Roam provides copywriting, design, QA, and platform execution for all channels.</li>
+                            <li class="sub-item">Popup creative, buildout, testing, and deployment included</li>
+                        </ul>
+                    </li>
+                    <li class="scope-item">
+                        <div class="scope-title"><i class="fa-solid fa-chart-line"></i> Optimization & Ongoing Support</div>
+                        <ul class="sub-list">
+                            <li class="sub-item">Ongoing A/B testing, segmentation improvements, and creative optimizations</li>
+                            <li class="sub-item">Strategic performance reviews and implementation of insights</li>
+                            <li class="sub-item">Biweekly strategy calls and async support via Slack and email</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 2. Monthly Utilization Table -->
+            <h2 class="text-lg font-bold mb-4">Utilization Ledger</h2>
+            <div class="table-container mb-8">
+                <table class="scope-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Allocated Scope</th>
+                            <th>Net New Campaigns</th>
+                            <th>Resends</th>
+                            <th>Flows</th>
+                            <th>Total Scope Used</th>
+                            <th>Total Remaining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">Jan 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">8</span></td>
+                            <td><span class="text-numeric text-gray-500">4</span></td>
+                            <td><span class="text-numeric text-gray-500">2</span></td>
+                            <td class="bg-total"><span class="text-numeric">14</span></td>
+                            <td><span class="status-positive">+9</span></td>
+                        </tr>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">Feb 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">10</span></td>
+                            <td><span class="text-numeric text-gray-500">5</span></td>
+                            <td><span class="text-numeric text-gray-500">1</span></td>
+                            <td class="bg-total"><span class="text-numeric">16</span></td>
+                            <td><span class="status-positive">+7</span></td>
+                        </tr>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">Mar 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">12</span></td>
+                            <td><span class="text-numeric text-gray-500">3</span></td>
+                            <td><span class="text-numeric text-gray-500">2</span></td>
+                            <td class="bg-total"><span class="text-numeric">17</span></td>
+                            <td><span class="status-positive">+6</span></td>
+                        </tr>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">Apr 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">15</span></td>
+                            <td><span class="text-numeric text-gray-500">4</span></td>
+                            <td><span class="text-numeric text-gray-500">3</span></td>
+                            <td class="bg-total"><span class="text-numeric">22</span></td>
+                            <td><span class="status-neutral">+1</span></td>
+                        </tr>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">May 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">14</span></td>
+                            <td><span class="text-numeric text-gray-500">5</span></td>
+                            <td><span class="text-numeric text-gray-500">4</span></td>
+                            <td class="bg-total"><span class="text-numeric">23</span></td>
+                            <td><span class="status-neutral">0</span></td>
+                        </tr>
+                        <tr class="group hover:bg-gray-50 transition-colors">
+                            <td><span class="font-bold text-gray-900">Jun 2025</span></td>
+                            <td><span class="text-numeric text-gray-600">23 Credits</span></td>
+                            <td><span class="text-numeric font-medium">15</span></td>
+                            <td><span class="text-numeric text-gray-500">6</span></td>
+                            <td><span class="text-numeric text-gray-500">3</span></td>
+                            <td class="bg-total"><span class="text-numeric">24</span></td>
+                            <td><span class="status-negative">-1</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 3. Guidelines & Definitions -->
+            <div class="scope-card mb-0">
+                <h2 class="text-lg font-bold mb-6 pb-4 border-b border-gray-100">Operational Guidelines</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 flex flex-col gap-6">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Turnaround Time</h3>
+                            <div class="flex items-center gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                                <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-orange-600 text-lg shadow-sm">
+                                    <i class="fa-regular fa-clock"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-bold text-gray-900 leading-none">5 Days</p>
+                                    <p class="text-[10px] text-gray-500 mt-1 uppercase font-semibold">Minimum SLA</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Additional Assets</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center p-3 rounded bg-white border border-gray-100">
+                                    <span class="text-sm font-medium text-gray-600"><i class="fa-regular fa-envelope mr-2 text-gray-400"></i>Email</span>
+                                    <span class="text-sm font-bold text-gray-900">$250<span class="text-gray-400 text-xs font-normal">/ea</span></span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded bg-white border border-gray-100">
+                                    <span class="text-sm font-medium text-gray-600"><i class="fa-regular fa-comment-dots mr-2 text-gray-400"></i>SMS</span>
+                                    <span class="text-sm font-bold text-gray-900">$50<span class="text-gray-400 text-xs font-normal">/ea</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 lg:pl-8 lg:border-l border-gray-100">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Definition: "Net New" Campaign</h3>
+                        <div class="text-xs text-gray-600 space-y-4 leading-relaxed">
+                            <p>
+                                A single email asset counts as <span class="font-bold text-gray-900 bg-orange-50 px-1 rounded">two (2) distinct creative versions</span> if it includes substantially different openings, restructured body copy, or a visually distinct layout.
+                            </p>
+                            <p>
+                                Minor edits (such as subject-line swaps, tone tweaks, image replacements, or CTA text changes that do not alter structure or concept) count as <span class="font-bold text-gray-900">one (1) version</span>.
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex gap-3 items-start">
+                                <i class="fa-solid fa-scale-balanced text-blue-400 mt-0.5 text-sm"></i>
+                                <div>
+                                    <p class="font-bold text-blue-900 mb-1">Practical Benchmark</p>
+                                    <p class="text-blue-700">If <span class="font-bold">30% or more</span> of an email's content, structure, or messaging intent changes, it is deemed a new asset.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+</body>
+</html>
