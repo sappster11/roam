@@ -97,10 +97,9 @@
 
                 <div class="mt-12 text-center border-t border-gray-100 pt-6">
                     <p class="text-xs text-gray-400 mb-4">
-                        Forgot your key? <a href="#" class="text-orange-600 hover:text-orange-500 transition-colors font-medium">Reset Protocol</a>
+                        Forgot your key? <a href="#" onclick="resetPassword()" class="text-orange-600 hover:text-orange-500 transition-colors font-medium">Reset Protocol</a>
                     </p>
                     
-                    <!-- NEW SIGNUP LINK -->
                     <p class="text-xs text-gray-400">
                         No credentials? <a href="signup.html" class="text-black font-bold hover:text-orange-600 transition-colors">Request Access</a>
                     </p>
@@ -115,7 +114,6 @@
         </div>
     </main>
 
-    <!-- Supabase & Auth Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
@@ -131,6 +129,8 @@
             btn.textContent = 'AUTHENTICATING...';
             btn.classList.add('opacity-75');
             errorMsg.classList.add('hidden');
+            errorMsg.classList.remove('text-green-600');
+            errorMsg.classList.add('text-red-600');
 
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: email,
@@ -153,6 +153,35 @@
                 options: { redirectTo: window.location.origin + '/portal.html' }
             })
             if (error) console.error(error);
+        }
+
+        async function resetPassword() {
+            const email = document.getElementById('email').value
+            const errorMsg = document.getElementById('login-error')
+            
+            errorMsg.classList.add('hidden')
+            errorMsg.classList.remove('text-green-600')
+            errorMsg.classList.add('text-red-600')
+            
+            if (!email) {
+                errorMsg.textContent = "ENTER YOUR EMAIL FIRST, THEN CLICK RESET PROTOCOL"
+                errorMsg.classList.remove('hidden')
+                return
+            }
+            
+            const { data, error } = await _supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: 'https://goroam.cc/reset-password.html'
+            })
+            
+            if (error) {
+                errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
+                errorMsg.classList.remove('hidden')
+            } else {
+                errorMsg.textContent = "RESET LINK SENT: CHECK YOUR EMAIL"
+                errorMsg.classList.remove('hidden')
+                errorMsg.classList.remove('text-red-600')
+                errorMsg.classList.add('text-green-600')
+            }
         }
     </script>
 </body>
