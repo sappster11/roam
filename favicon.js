@@ -76,7 +76,7 @@
         let svgLink = document.createElement('link');
         svgLink.rel = 'icon';
         svgLink.type = 'image/svg+xml';
-        svgLink.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="${encodeURIComponent(CONFIG.backgroundColor)}"/><circle cx="50" cy="50" r="39" fill="${encodeURIComponent(CONFIG.circleColor)}"/></svg>`;
+        svgLink.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${encodeURIComponent(CONFIG.circleColor)}"/></svg>`;
         document.head.appendChild(svgLink);
 
         // PNG fallback for browsers that don't support SVG favicons
