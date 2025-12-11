@@ -114,98 +114,95 @@
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
 
-        // Cookie-based storage for Cloudflare Worker compatibility
-        const cookieStorage = {
-            getItem: (key) => {
-                const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
-                return match ? decodeURIComponent(match[2]) : null
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+        auth: {
+            storage: {
+                getItem: (key) => {
+                    const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
+                    return match ? decodeURIComponent(match[2]) : null
+                },
+                setItem: (key, value) => {
+                    document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
+                },
+                removeItem: (key) => {
+                    document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                }
             },
-            setItem: (key, value) => {
-                document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
-            },
-            removeItem: (key) => {
-                document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
-            }
+            storageKey: 'sb-rtmewagtvmubpushnzag-auth-token',
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
         }
+    })
 
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-            auth: {
-                storage: cookieStorage,
-                storageKey: 'sb-rtmewagtvmubpushnzag-auth-token',
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: true
-            }
+    async function handleLogin() {
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+        const btn = document.querySelector('.btn-primary')
+        const errorMsg = document.getElementById('login-error')
+
+        btn.textContent = 'AUTHENTICATING...'
+        btn.classList.add('opacity-75')
+        errorMsg.classList.add('hidden')
+        errorMsg.classList.remove('text-green-600')
+        errorMsg.classList.add('text-red-600')
+
+        const { data, error } = await _supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
         })
 
-        async function handleLogin() {
-            const email = document.getElementById('email').value
-            const password = document.getElementById('password').value
-            const btn = document.querySelector('.btn-primary')
-            const errorMsg = document.getElementById('login-error')
-
-            btn.textContent = 'AUTHENTICATING...'
-            btn.classList.add('opacity-75')
-            errorMsg.classList.add('hidden')
-            errorMsg.classList.remove('text-green-600')
-            errorMsg.classList.add('text-red-600')
-
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            })
-
-            if (error) {
-                errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
-                errorMsg.classList.remove('hidden')
-                btn.textContent = 'INITIALIZE SESSION'
-                btn.classList.remove('opacity-75')
-            } else {
-                window.location.href = "portal.html"
-            }
+        if (error) {
+            errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
+            errorMsg.classList.remove('hidden')
+            btn.textContent = 'INITIALIZE SESSION'
+            btn.classList.remove('opacity-75')
+        } else {
+            window.location.href = "/portal.html"
         }
+    }
 
-        async function signInWithGoogle() {
-            const { data, error } = await _supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: window.location.origin + '/portal.html' }
-            })
-            if (error) console.error(error)
-        }
+    async function signInWithGoogle() {
+        const { data, error } = await _supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: window.location.origin + '/portal.html' }
+        })
+        if (error) console.error(error)
+    }
 
-        async function resetPassword() {
-            const email = document.getElementById('email').value
-            const errorMsg = document.getElementById('login-error')
-            
-            errorMsg.classList.add('hidden')
-            errorMsg.classList.remove('text-green-600')
-            errorMsg.classList.add('text-red-600')
-            
-            if (!email) {
-                errorMsg.textContent = "ENTER YOUR EMAIL FIRST, THEN CLICK RESET PROTOCOL"
-                errorMsg.classList.remove('hidden')
-                return
-            }
-            
-            const { data, error } = await _supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'https://goroam.cc/reset-password.html'
-            })
-            
-            if (error) {
-                errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
-                errorMsg.classList.remove('hidden')
-            } else {
-                errorMsg.textContent = "RESET LINK SENT: CHECK YOUR EMAIL"
-                errorMsg.classList.remove('hidden')
-                errorMsg.classList.remove('text-red-600')
-                errorMsg.classList.add('text-green-600')
-            }
+    async function resetPassword() {
+        const email = document.getElementById('email').value
+        const errorMsg = document.getElementById('login-error')
+        
+        errorMsg.classList.add('hidden')
+        errorMsg.classList.remove('text-green-600')
+        errorMsg.classList.add('text-red-600')
+        
+        if (!email) {
+            errorMsg.textContent = "ENTER YOUR EMAIL FIRST, THEN CLICK RESET PROTOCOL"
+            errorMsg.classList.remove('hidden')
+            return
         }
-    </script>
+        
+        const { data, error } = await _supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://goroam.cc/reset-password.html'
+        })
+        
+        if (error) {
+            errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
+            errorMsg.classList.remove('hidden')
+        } else {
+            errorMsg.textContent = "RESET LINK SENT: CHECK YOUR EMAIL"
+            errorMsg.classList.remove('hidden')
+            errorMsg.classList.remove('text-red-600')
+            errorMsg.classList.add('text-green-600')
+        }
+    }
+</script>
 </body>
 </html>
