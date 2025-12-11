@@ -96,9 +96,15 @@
                 </div>
 
                 <div class="mt-12 text-center border-t border-gray-100 pt-6">
-                    <p class="text-xs text-gray-400">
+                    <p class="text-xs text-gray-400 mb-4">
                         Forgot your key? <a href="#" class="text-orange-600 hover:text-orange-500 transition-colors font-medium">Reset Protocol</a>
                     </p>
+                    
+                    <!-- NEW SIGNUP LINK -->
+                    <p class="text-xs text-gray-400">
+                        No credentials? <a href="signup.html" class="text-black font-bold hover:text-orange-600 transition-colors">Request Access</a>
+                    </p>
+
                     <p id="login-error" class="text-red-600 text-xs font-bold mt-4 hidden"></p>
                 </div>
             </div>
@@ -109,86 +115,45 @@
         </div>
     </main>
 
+    <!-- Supabase & Auth Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
-
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-            auth: {
-                flowType: 'pkce',
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: true,
-                storage: {
-                    getItem: (key) => {
-                        const cookies = document.cookie.split(';')
-                        const cookie = cookies.find(c => c.trim().startsWith(key + '='))
-                        return cookie ? decodeURIComponent(cookie.split('=')[1]) : null
-                    },
-                    setItem: (key, value) => {
-                        document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
-                    },
-                    removeItem: (key) => {
-                        document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
-                    }
-                }
-            }
-        })
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
 
         async function handleLogin() {
             const email = document.getElementById('email').value
             const password = document.getElementById('password').value
+            const btn = document.querySelector('.btn-primary');
             const errorMsg = document.getElementById('login-error');
-            const btn = document.querySelector('button');
-            
+
+            btn.textContent = 'AUTHENTICATING...';
+            btn.classList.add('opacity-75');
             errorMsg.classList.add('hidden');
-            btn.innerHTML = 'AUTHENTICATING...';
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
 
-            try {
-                const { data, error } = await _supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                })
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            })
 
-                if (error) {
-                    errorMsg.textContent = "ACCESS DENIED: " + error.message;
-                    errorMsg.classList.remove('hidden');
-                    btn.innerHTML = 'INITIALIZE SESSION';
-                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                } else {
-                    console.log("Login successful! Redirecting to portal...");
-                    window.location.replace("https://goroam.cc/portal.html");
-                }
-            } catch (err) {
-                console.error(err);
-                errorMsg.textContent = "SYSTEM FAILURE. CHECK CONSOLE.";
+            if (error) {
+                errorMsg.textContent = "ERROR: " + error.message.toUpperCase();
                 errorMsg.classList.remove('hidden');
-                btn.innerHTML = 'INITIALIZE SESSION';
-                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                btn.textContent = 'INITIALIZE SESSION';
+                btn.classList.remove('opacity-75');
+            } else {
+                window.location.href = "portal.html"; 
             }
         }
 
         async function signInWithGoogle() {
             const { data, error } = await _supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: {
-                    redirectTo: 'https://goroam.cc/portal'
-                }
+                options: { redirectTo: window.location.origin + '/portal.html' }
             })
-            
-            if (error) {
-                console.error('Google sign-in error:', error)
-                alert('Error signing in with Google')
-            }
+            if (error) console.error(error);
         }
-
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                handleLogin();
-            }
-        });
     </script>
 </body>
 </html>
