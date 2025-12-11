@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assets & Resources | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+    <style>
+        /* --- PAGE-SPECIFIC ASSETS STYLES --- */
+        .asset-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            margin-bottom: 2rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background-color: #f9fafb;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(235, 94, 40, 0.1);
+        }
+
+        /* Table Styles */
+        .table-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        .asset-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+        }
+        .asset-table th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+        .asset-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: #1f2937;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .asset-table tr:last-child td { border-bottom: none; }
+        .asset-table tr:hover { background-color: #fafafa; }
+
+        /* Category Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .badge-photo { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-marketing { background-color: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+        .badge-goals { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-brand { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+        .badge-other { background-color: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+        .action-btn {
+            color: #9ca3af;
+            transition: color 0.2s;
+            padding: 0.25rem;
+        }
+        .action-btn:hover { color: #ef4444; }
+    </style>
+</head>
+<body data-page="assets">
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen pt-8 px-8"> 
+        
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header">
+            <div>
+                <h1 class="text-3xl font-bold text-black">Assets & Resources</h1>
+                <p class="text-xs text-gray-500 mt-1">Central repository for all strategic documents and creative assets.</p>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Area -->
+        <div class="flex-grow overflow-y-auto pb-10">
+            
+            <!-- Upload/Add Section -->
+            <div class="asset-card">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-orange-600"></i> Log New Asset
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-4 input-group">
+                        <label>Asset Name</label>
+                        <input type="text" id="assetName" class="form-input" placeholder="e.g. Q4 Lifestyle Shoot">
+                    </div>
+                    <div class="md:col-span-5 input-group">
+                        <label>Link URL</label>
+                        <input type="text" id="assetLink" class="form-input" placeholder="https://drive.google.com/...">
+                    </div>
+                    <div class="md:col-span-3 input-group">
+                        <label>Category</label>
+                        <select id="assetCategory" class="form-input cursor-pointer">
+                            <option value="Photography">Photography</option>
+                            <option value="Marketing Calendar">Marketing Calendar</option>
+                            <option value="Goals/Forecast">Goals/Forecast</option>
+                            <option value="Brand Guidelines">Brand Guidelines</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="md:col-span-10 input-group">
+                        <label>Notes</label>
+                        <textarea id="assetNotes" class="form-input resize-y" rows="3" placeholder="Add context, instructions, or descriptions..."></textarea>
+                    </div>
+                    <div class="md:col-span-2 flex items-end">
+                        <button onclick="addAsset()" class="w-full py-2.5 bg-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors shadow-sm mb-[5px]">
+                            Add Asset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Log Table -->
+            <div class="table-container">
+                <table class="asset-table" id="assetTable">
+                    <thead>
+                        <tr>
+                            <th class="w-1/5">Resource Name</th>
+                            <th>Category</th>
+                            <th>Uploaded By</th>
+                            <th>Date Added</th>
+                            <th>Link</th>
+                            <th class="w-1/3">Notes</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assetBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+
+    <!-- Page-specific scripts -->
+    <script>
+        // Mock Initial Data
+        let assets = [
+            { 
+                id: 1, 
+                name: "Q4 Product Photography", 
+                category: "Photography", 
+                user: "Sarah Miller", 
+                logoUrl: null, 
+                date: "Nov 01, 2025 10:23 AM", 
+                link: "#",
+                notes: "Raw files from the studio session. Includes all angles and flat lays."
+            },
+            { 
+                id: 2, 
+                name: "2026 Growth Forecast", 
+                category: "Goals/Forecast", 
+                user: "Mike Ross", 
+                logoUrl: "https://via.placeholder.com/150/000000/FFFFFF?text=VC", 
+                date: "Oct 28, 2025 04:15 PM", 
+                link: "#",
+                notes: "Preliminary Q1 projections included. Pending finance review."
+            },
+            { 
+                id: 3, 
+                name: "Updated Brand Voice Guidelines", 
+                category: "Brand Guidelines", 
+                user: "Jessica P.", 
+                logoUrl: null, 
+                date: "Oct 15, 2025 09:00 AM", 
+                link: "#",
+                notes: "Updated tone for social channels."
+            },
+            { 
+                id: 4, 
+                name: "Holiday Promo Calendar V2", 
+                category: "Marketing Calendar", 
+                user: "Sarah Miller", 
+                logoUrl: null,
+                date: "Oct 10, 2025 02:30 PM", 
+                link: "#",
+                notes: "Approved by leadership. Shared with agencies."
+            }
+        ];
+
+        function renderAssets() {
+            const tbody = document.getElementById('assetBody');
+            tbody.innerHTML = '';
+
+            assets.forEach(asset => {
+                const row = document.createElement('tr');
+                
+                let badgeClass = 'badge-other';
+                if(asset.category === 'Photography') badgeClass = 'badge-photo';
+                else if(asset.category === 'Marketing Calendar') badgeClass = 'badge-marketing';
+                else if(asset.category === 'Goals/Forecast') badgeClass = 'badge-goals';
+                else if(asset.category === 'Brand Guidelines') badgeClass = 'badge-brand';
+
+                let uploaderIcon;
+                if (asset.logoUrl) {
+                    uploaderIcon = `<img src="${asset.logoUrl}" class="w-6 h-6 rounded-full object-cover border border-gray-200" alt="${asset.user}">`;
+                } else {
+                    uploaderIcon = `<div class="w-6 h-6 rounded-full bg-gray-100 text-xs flex items-center justify-center text-gray-400 border border-gray-200"><i class="fa-solid fa-user"></i></div>`;
+                }
+
+                const notesDisplay = asset.notes ? asset.notes : '<span class="text-gray-300 italic text-xs">No notes</span>';
+
+                row.innerHTML = `
+                    <td>
+                        <span class="font-bold text-gray-900">${asset.name}</span>
+                    </td>
+                    <td>
+                        <span class="badge ${badgeClass}">${asset.category}</span>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            ${uploaderIcon}
+                            <span class="text-sm text-gray-600">${asset.user}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="text-xs text-gray-500 font-mono">${asset.date}</span>
+                    </td>
+                    <td>
+                        <a href="${asset.link}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-link"></i> Open
+                        </a>
+                    </td>
+                    <td>
+                        <span class="text-xs text-gray-600 block leading-snug" title="${asset.notes}">${notesDisplay}</span>
+                    </td>
+                    <td class="text-right">
+                        <button onclick="deleteAsset(${asset.id})" class="action-btn" title="Delete from Database">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function addAsset() {
+            const nameInput = document.getElementById('assetName');
+            const linkInput = document.getElementById('assetLink');
+            const catInput = document.getElementById('assetCategory');
+            const notesInput = document.getElementById('assetNotes');
+
+            if (!nameInput.value) {
+                alert("Please enter an asset name.");
+                return;
+            }
+
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            const newAsset = {
+                id: Date.now(),
+                name: nameInput.value,
+                link: linkInput.value || '#',
+                category: catInput.value,
+                user: "Velvet Clothing",
+                logoUrl: null,
+                date: dateString,
+                notes: notesInput.value
+            };
+
+            assets.unshift(newAsset);
+            renderAssets();
+
+            nameInput.value = '';
+            linkInput.value = '';
+            notesInput.value = '';
+        }
+
+        function deleteAsset(id) {
+            if(confirm("Are you sure you want to delete this asset record from the database?")) {
+                assets = assets.filter(a => a.id !== id);
+                renderAssets();
+            }
+        }
+
+        renderAssets();
+    </script>
+</body>
+</html>
