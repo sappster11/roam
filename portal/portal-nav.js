@@ -21,13 +21,13 @@ function loadPortalNav() {
 
         <!-- Navigation -->
         <nav class="flex-1 overflow-y-auto pt-2">
-            <a href="portal.html" class="nav-item" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> <span class="nav-label">Dashboard</span></a>
-            <a href="portal-calendar.html" class="nav-item" data-page="calendar"><i class="fa-solid fa-calendar-days"></i> <span class="nav-label">Campaign Calendar</span></a>
-            <a href="portal-projects.html" class="nav-item" data-page="projects"><i class="fa-solid fa-list-check"></i> <span class="nav-label">Project Status</span></a>
-            <a href="portal-testing.html" class="nav-item" data-page="testing"><i class="fa-solid fa-flask"></i> <span class="nav-label">Testing Tracker</span></a>
-            <a href="portal-scope.html" class="nav-item" data-page="scope"><i class="fa-solid fa-bullseye"></i> <span class="nav-label">Scope</span></a>
-            <a href="portal-assets.html" class="nav-item" data-page="assets"><i class="fa-solid fa-folder-tree"></i> <span class="nav-label">Assets & Resources</span></a>
-            <a href="portal-billing.html" class="nav-item" data-page="billing"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="nav-label">Billing</span></a>
+            <a href="/portal" class="nav-item" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> <span class="nav-label">Dashboard</span></a>
+            <a href="/portal/calendar" class="nav-item" data-page="calendar"><i class="fa-solid fa-calendar-days"></i> <span class="nav-label">Campaign Calendar</span></a>
+            <a href="/portal/projects" class="nav-item" data-page="projects"><i class="fa-solid fa-list-check"></i> <span class="nav-label">Project Status</span></a>
+            <a href="/portal/testing" class="nav-item" data-page="testing"><i class="fa-solid fa-flask"></i> <span class="nav-label">Testing Tracker</span></a>
+            <a href="/portal/scope" class="nav-item" data-page="scope"><i class="fa-solid fa-bullseye"></i> <span class="nav-label">Scope</span></a>
+            <a href="/portal/assets" class="nav-item" data-page="assets"><i class="fa-solid fa-folder-tree"></i> <span class="nav-label">Assets & Resources</span></a>
+            <a href="/portal/billing" class="nav-item" data-page="billing"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="nav-label">Billing</span></a>
         </nav>
 
         <!-- Sidebar Footer -->
