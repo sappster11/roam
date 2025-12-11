@@ -8,273 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chosen Palette: Warm Neutrals with Orange Accent -->
-    <!-- Application Structure Plan: Dashboard layout with Sidebar navigation. 
-         Header: Date Picker & Context. 
-         Top: KPI Cards with dynamic YoY/PoP comparison. 
-         Middle: Revenue Chart (Grouped Tooltip) & Upcoming Schedule. 
-         Bottom: Quick Resources, Support FAQ, and Urgent Contact Footer. -->
-    <!-- Visualization & Content Choices: 
-         1. KPIs: Text-based with trend icons. Dynamic JS updates for comparison modes.
-         2. Revenue Chart: Chart.js Bar chart. Grouped tooltip showing % mix of Campaigns vs Flows.
-         3. Schedule: List view with iconic tags.
-         4. Footer: Distinct black bar for priority contact (visual break).
-         5. Sidebar: Footer Anchor collapse pattern (Option 1). -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        :root {
-            --bg-cream: #FDFCF8;
-            --bg-sidebar: #050505;
-            --accent-orange: #EB5E28;
-            --border-light: rgba(0,0,0,0.05);
-            --border-dark: rgba(255,255,255,0.1);
-            --sidebar-width: 280px;
-            --sidebar-collapsed-width: 80px;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-cream);
-            color: #111;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        /* --- MOBILE OVERLAY (High Z-Index) --- */
-        .mobile-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 40; /* Behind sidebar, above content */
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(2px);
-        }
-        .mobile-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* --- SIDEBAR --- */
-        aside {
-            background-color: var(--bg-sidebar);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            border-right: 1px solid var(--border-dark);
-            flex-shrink: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 50; /* Top level */
-            height: 100%;
-        }
-
-        /* Desktop: Default Width */
-        @media (min-width: 1024px) {
-            aside {
-                width: var(--sidebar-width);
-                transform: translateX(0) !important; /* Always visible */
-            }
-            /* Desktop Collapsed Variant */
-            aside.desktop-collapsed {
-                width: var(--sidebar-collapsed-width);
-                padding: 1.5rem 1rem;
-            }
-            aside.desktop-collapsed .logo-text,
-            aside.desktop-collapsed .nav-label,
-            aside.desktop-collapsed .user-info,
-            aside.desktop-collapsed .group-label {
-                display: none;
-                opacity: 0;
-            }
-            aside.desktop-collapsed .nav-item {
-                justify-content: center;
-                padding: 0.75rem;
-            }
-            aside.desktop-collapsed .nav-item i {
-                margin-right: 0;
-                font-size: 1.2rem;
-            }
-            /* Rotate the collapse icon when collapsed */
-            aside.desktop-collapsed .collapse-icon {
-                transform: rotate(180deg);
-            }
-            aside.desktop-collapsed .collapse-btn {
-                justify-content: center;
-            }
-            aside.desktop-collapsed .collapse-text {
-                display: none;
-            }
-        }
-
-        /* Mobile: Off-Canvas Logic */
-        @media (max-width: 1024px) {
-            aside {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 280px;
-                transform: translateX(-100%); /* Start Hidden */
-            }
-            aside.mobile-open {
-                transform: translateX(0); /* Slide In */
-                box-shadow: 10px 0 50px rgba(0,0,0,0.5);
-            }
-        }
-
-        /* Nav Items */
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: #999;
-            border-radius: 0.5rem;
-            margin-bottom: 0.25rem;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-decoration: none;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        .nav-item:hover {
-            background-color: rgba(255,255,255,0.08);
-            color: #fff;
-        }
-        .nav-item.active {
-            background-color: rgba(235, 94, 40, 0.15);
-            color: var(--accent-orange);
-            border-left: 3px solid var(--accent-orange);
-            border-radius: 0 0.375rem 0.375rem 0;
-        }
-        .nav-item i { width: 24px; margin-right: 12px; flex-shrink: 0; }
-
-        /* Content Area */
-        main {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 2rem 3rem;
-            width: 100%;
-            position: relative;
-        }
-        @media (max-width: 768px) { main { padding: 1.5rem; } }
-
-        /* Headers */
-        .mobile-header {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-        @media (max-width: 1024px) { .mobile-header { display: flex; } }
-
-        header.desktop-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-        }
-        @media (max-width: 1024px) { header.desktop-header { display: none; } }
-
-        /* Rest of Styles */
-        .card { background: #fff; border: 1px solid var(--border-light); border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; }
-        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666; font-weight: 700; }
-        .metric-sub { font-size: 0.75rem; color: #999; margin-top: 0.25rem; }
-        .text-green { color: #10B981; }
-        .text-red { color: #EF4444; }
-        
-        /* New Components */
-        .cal-mini-item { display: flex; align-items: flex-start; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
-        .cal-mini-item:last-child { border-bottom: none; }
-        .cal-date-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.25rem 0.5rem; text-align: center; margin-right: 1rem; min-width: 50px; }
-        .cal-month { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: #888; display: block; }
-        .cal-day { font-size: 1.1rem; font-weight: 800; color: #111; line-height: 1; }
-        details.faq-item { border-bottom: 1px solid #f3f4f6; padding: 1rem 0; }
-        details.faq-item:last-child { border-bottom: none; }
-        summary { font-weight: 600; font-size: 0.9rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-        summary::-webkit-details-marker { display: none; }
-        .faq-answer { font-size: 0.85rem; color: #666; line-height: 1.5; padding-top: 0.5rem; }
-
-        /* Asset Link */
-        .mini-resource {
-            display: flex; align-items: center; padding: 0.75rem; border-bottom: 1px solid #f3f4f6; transition: background 0.2s; text-decoration: none; border-radius: 0.375rem;
-        }
-        .mini-resource:hover { background: #f9fafb; }
-        .mini-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #666; border-radius: 4px; margin-right: 0.75rem; font-size: 0.7rem; }
-    </style>
+    <link rel="stylesheet" href="portal-styles.css">
 </head>
-<body>
+<body data-page="dashboard">
 
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileSidebar()"></div>
-
-    <!-- Sidebar -->
-    <aside id="sidebar">
-        <!-- Logo Area -->
-        <div class="mb-10 flex items-center justify-between px-2">
-            <div class="flex items-center gap-3">
-                <span class="w-4 h-4 bg-orange-600 rounded-full flex-shrink-0"></span>
-                <span class="text-xl font-bold tracking-tight text-white logo-text">Roam.</span>
-            </div>
-            <button onclick="toggleMobileSidebar()" class="lg:hidden text-gray-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto pt-2">
-            <!-- Removed Intelligence Label -->
-            <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> <span class="nav-label">Dashboard</span></a>
-            
-            <!-- Removed Deep Dive -->
-            
-            <!-- New: Campaign Calendar -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-calendar-days"></i> <span class="nav-label">Campaign Calendar</span></a>
-
-            <!-- Existing: Project Status -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-list-check"></i> <span class="nav-label">Project Status</span></a>
-
-            <!-- New: Testing Tracker -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-flask"></i> <span class="nav-label">Testing Tracker</span></a>
-
-            <!-- New: Scope -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-bullseye"></i> <span class="nav-label">Scope</span></a>
-
-            <!-- Renamed: Assets & Resources -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-folder-tree"></i> <span class="nav-label">Assets & Resources</span></a>
-
-            <!-- Removed Operations Label -->
-            <a href="#" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="nav-label">Billing</span></a>
-        </nav>
-
-        <!-- Sidebar Footer Anchor (Option 1) -->
-        <div class="mt-auto">
-            <!-- Collapse Toggle Button -->
-            <button onclick="toggleDesktopSidebar()" class="hidden lg:flex w-full items-center px-2 py-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-md transition-colors mb-4 collapse-btn group">
-                <i class="fa-solid fa-angles-left text-lg transition-transform duration-300 collapse-icon group-hover:text-orange-500"></i>
-                <span class="text-sm font-medium ml-3 collapse-text">Collapse Sidebar</span>
-            </button>
-
-            <!-- User Profile Section -->
-            <div class="pt-6 border-t border-white/10">
-                <div class="flex items-center gap-3 px-2">
-                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">VC</div>
-                    <div class="user-info overflow-hidden">
-                        <p class="text-sm font-medium text-white truncate">Velvet Clothing</p>
-                        <p class="text-xs text-gray-500">Enterprise Plan</p>
-                    </div>
-                </div>
-                <a href="#" class="block mt-4 text-xs text-red-400 hover:text-red-300 ml-2 user-info">Sign Out</a>
-            </div>
-        </div>
-    </aside>
+    <!-- Nav loads automatically via portal-nav.js -->
 
     <!-- Main Content -->
     <main>
@@ -310,28 +48,24 @@
                     <!-- PRESET MENU VIEW -->
                     <div id="presetMenu">
                         <div class="p-1 space-y-0.5">
-                            <!-- Relative Days -->
                             <button onclick="selectDateRange('Last 30 Days')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors font-medium">Last 30 Days</button>
                             <button onclick="selectDateRange('Last 90 Days')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Last 90 Days</button>
                             <button onclick="selectDateRange('Last 365 Days')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Last 365 Days</button>
                             
                             <div class="border-t border-gray-100 my-1"></div>
                             
-                            <!-- To Date -->
                             <button onclick="selectDateRange('Month to Date')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Month to Date</button>
                             <button onclick="selectDateRange('Quarter to Date')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Quarter to Date</button>
                             <button onclick="selectDateRange('Year to Date')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Year to Date</button>
                             
                             <div class="border-t border-gray-100 my-1"></div>
                             
-                            <!-- Past Periods -->
                             <button onclick="selectDateRange('Last Month')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Last Month</button>
                             <button onclick="selectDateRange('Last 12 Months')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Last 12 Months</button>
                             <button onclick="selectDateRange('Last Year')" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors">Last Year</button>
                             
                             <div class="border-t border-gray-100 my-1"></div>
                             
-                            <!-- Custom -->
                             <button onclick="showCustomRange()" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-md transition-colors flex justify-between items-center group">
                                 <span>Custom Range...</span>
                                 <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
@@ -366,35 +100,30 @@
                         <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                             <button onclick="hideCustomRange()" class="text-gray-400 hover:text-black transition-colors p-1 -ml-1"><i class="fa-solid fa-arrow-left"></i></button>
                             <span class="font-bold text-sm text-gray-800">Select Dates</span>
-                            <div class="w-4"></div> <!-- Spacer -->
+                            <div class="w-4"></div>
                         </div>
 
-                        <!-- Date Inputs -->
                         <div class="flex gap-2 mb-4">
                             <div class="flex-1 relative group">
                                 <label class="text-[10px] uppercase font-bold text-gray-400 mb-1 block">Start Date</label>
                                 <input type="text" id="startDateInput" 
                                     class="w-full text-xs font-medium border border-gray-200 rounded p-2 cursor-pointer focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-gray-700" 
                                     placeholder="Select..." readonly onclick="setSelectionMode('start')">
-                                <div id="startIndicator" class="hidden absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full translate-x-1 -translate-y-1"></div>
                             </div>
                             <div class="flex-1 relative group">
                                 <label class="text-[10px] uppercase font-bold text-gray-400 mb-1 block">End Date</label>
                                 <input type="text" id="endDateInput" 
                                     class="w-full text-xs font-medium border border-gray-200 rounded p-2 cursor-pointer focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-gray-700" 
                                     placeholder="Select..." readonly onclick="setSelectionMode('end')">
-                                <div id="endIndicator" class="hidden absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full translate-x-1 -translate-y-1"></div>
                             </div>
                         </div>
 
-                        <!-- Calendar Controls -->
                         <div class="flex justify-between items-center mb-3 px-1">
                             <button onclick="changeMonth(-1)" class="text-gray-400 hover:text-black hover:bg-gray-100 p-1.5 rounded-full transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
                             <span id="calendarMonthLabel" class="text-xs font-bold text-gray-800"></span>
                             <button onclick="changeMonth(1)" class="text-gray-400 hover:text-black hover:bg-gray-100 p-1.5 rounded-full transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                         </div>
 
-                        <!-- Calendar Grid -->
                         <div class="grid grid-cols-7 gap-1 text-center mb-2">
                             <span class="text-[10px] font-bold text-gray-300">Su</span>
                             <span class="text-[10px] font-bold text-gray-300">Mo</span>
@@ -404,9 +133,7 @@
                             <span class="text-[10px] font-bold text-gray-300">Fr</span>
                             <span class="text-[10px] font-bold text-gray-300">Sa</span>
                         </div>
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center mb-4">
-                            <!-- JS will populate this -->
-                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center mb-4"></div>
 
                         <button onclick="applyCustomRange()" class="w-full bg-black text-white text-xs font-bold py-2.5 rounded hover:bg-gray-800 transition shadow-sm">Apply Range</button>
                     </div>
@@ -417,7 +144,6 @@
 
         <!-- KPI Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Card 1: Total Revenue -->
             <div class="card">
                 <p class="metric-label">Total Revenue</p>
                 <div class="mb-1">
@@ -433,7 +159,6 @@
                 </div>
             </div>
 
-            <!-- Card 2: Attributed Revenue -->
             <div class="card">
                 <p class="metric-label text-orange-600">Attributed Revenue</p>
                 <div class="mb-1">
@@ -449,7 +174,6 @@
                 </div>
             </div>
 
-            <!-- Card 3: Campaigns Sent -->
             <div class="card">
                 <p class="metric-label">Campaigns Sent</p>
                 <div class="mb-1">
@@ -457,7 +181,6 @@
                     <p class="metric-sub" id="campaignsPrevValue">12 prev. 30 days</p>
                 </div>
                 <div class="flex items-center gap-2 mt-2">
-                    <!-- Removed text-xs to match other cards -->
                     <p class="metric-change text-green">
                         <i class="fa-solid fa-arrow-up"></i> 
                         <span id="campaignsComparisonText">+16.6% PoP</span>
@@ -469,7 +192,6 @@
         <!-- Middle Section: Chart + Schedule -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             
-            <!-- Revenue Chart -->
             <div class="card lg:col-span-2">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="font-bold text-black">Revenue Mix (Campaigns vs Flows)</h3>
@@ -483,14 +205,12 @@
                 </div>
             </div>
 
-            <!-- NEW: Upcoming Schedule -->
             <div class="card">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-black">Up Next</h3>
-                    <a href="#" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">Full Calendar &rarr;</a>
+                    <a href="portal-calendar.html" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">Full Calendar &rarr;</a>
                 </div>
                 <div class="flex flex-col gap-0">
-                    <!-- Item 1 -->
                     <div class="cal-mini-item">
                         <div class="cal-date-box">
                             <span class="cal-month">NOV</span>
@@ -503,7 +223,6 @@
                             </span>
                         </div>
                     </div>
-                    <!-- Item 2 -->
                     <div class="cal-mini-item">
                         <div class="cal-date-box">
                             <span class="cal-month">NOV</span>
@@ -516,7 +235,6 @@
                             </span>
                         </div>
                     </div>
-                    <!-- Item 3 -->
                     <div class="cal-mini-item">
                         <div class="cal-date-box">
                             <span class="cal-month">NOV</span>
@@ -534,14 +252,13 @@
 
         </div>
 
-        <!-- Bottom Section: FAQ & Priority & Quick Links -->
+        <!-- Bottom Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             
-            <!-- Quick Resources (Now taller with 5 items) -->
             <div class="card">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-black">Quick Links</h3>
-                    <a href="#" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">View All</a>
+                    <a href="portal-assets.html" class="text-xs text-orange-600 font-bold hover:text-orange-800 uppercase">View All</a>
                 </div>
                 <div class="flex flex-col gap-1">
                     <a href="#" target="_blank" class="mini-resource">
@@ -582,7 +299,6 @@
                 </div>
             </div>
 
-            <!-- Quick Support (Expanded to 2 columns) -->
             <div class="card lg:col-span-2">
                 <h3 class="font-bold text-black mb-4">Quick Support</h3>
                 <div class="space-y-1">
@@ -627,7 +343,7 @@
 
         </div>
 
-        <!-- New Footer Priority Line -->
+        <!-- Footer Priority Line -->
         <div class="w-full bg-black text-white rounded-lg p-4 flex flex-col sm:flex-row justify-between items-center gap-4 mb-10 shadow-lg">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
@@ -642,70 +358,48 @@
 
     </main>
 
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+    
+    <!-- Page-specific scripts -->
     <script>
-        // SEPARATE LOGIC FOR MOBILE AND DESKTOP TOGGLES
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        }
-
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('desktop-collapsed');
-        }
-
+        // Date Picker Functions
         function toggleDatePicker() {
             const dropdown = document.getElementById('dateDropdown');
             dropdown.classList.toggle('hidden');
-            
-            // Only reset to preset menu if we are OPENING it, not closing it.
-            // And if we are opening it, we want to start fresh.
             if (!dropdown.classList.contains('hidden')) {
-                 hideCustomRange();
+                hideCustomRange();
             }
         }
 
-        // State for dynamic updates
         let currentRange = 'Last 30 Days';
         let currentComparisonMode = 'period';
 
         function selectDateRange(rangeText) {
-            const label = document.getElementById('dateLabel');
-            label.innerText = rangeText;
+            document.getElementById('dateLabel').innerText = rangeText;
             document.getElementById('dateDropdown').classList.add('hidden');
-            
-            // Update state and refresh metrics
             currentRange = rangeText;
             updateDashboardMetrics();
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const container = document.getElementById('datePickerContainer');
             const dropdown = document.getElementById('dateDropdown');
-            // Check if dropdown is open and click is outside
             if (container && !container.contains(event.target) && !dropdown.classList.contains('hidden')) {
                 dropdown.classList.add('hidden');
             }
         });
 
-        // --- Custom Calendar Logic ---
+        // Custom Calendar
         let currentDate = new Date();
-        let selectionMode = 'start'; // 'start' or 'end'
+        let selectionMode = 'start';
         let startDate = null;
         let endDate = null;
 
         function showCustomRange() {
             document.getElementById('presetMenu').classList.add('hidden');
             document.getElementById('customMenu').classList.remove('hidden');
-            // Don't reset selection if user just toggled back and forth, 
-            // but we can initialize month if needed.
             renderCalendar();
-            
-            // If no dates selected, default to start mode
             if(!startDate) setSelectionMode('start');
         }
 
@@ -718,8 +412,6 @@
             selectionMode = mode;
             const startInput = document.getElementById('startDateInput');
             const endInput = document.getElementById('endDateInput');
-            
-            // Visual feedback for active input
             if(mode === 'start') {
                 startInput.classList.add('border-orange-500', 'ring-1', 'ring-orange-500');
                 endInput.classList.remove('border-orange-500', 'ring-1', 'ring-orange-500');
@@ -739,44 +431,25 @@
             const grid = document.getElementById('calendarGrid');
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             monthLabel.innerText = `${monthNames[month]} ${year}`;
-
             grid.innerHTML = '';
-
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            // Empty slots for previous month
             for (let i = 0; i < firstDay; i++) {
-                const empty = document.createElement('div');
-                grid.appendChild(empty);
+                grid.appendChild(document.createElement('div'));
             }
-
-            // Days
             for (let day = 1; day <= daysInMonth; day++) {
                 const btn = document.createElement('button');
                 btn.innerText = day;
                 btn.className = "w-8 h-8 flex items-center justify-center text-xs rounded-full hover:bg-gray-100 transition text-gray-700 font-medium";
-                
-                // Highlight logic
                 const thisDateStr = new Date(year, month, day).toDateString();
                 const isStart = startDate && startDate.toDateString() === thisDateStr;
                 const isEnd = endDate && endDate.toDateString() === thisDateStr;
-
-                // Range Highlight (Simple visual for start/end, filling is complex without date logic libraries, keeping it clean for now)
-                
                 if (isStart || isEnd) {
                     btn.className = "w-8 h-8 flex items-center justify-center text-xs rounded-full bg-orange-600 text-white font-bold shadow-md transform scale-105";
                 }
-
-                // IMPORTANT FIX: stopPropagation prevents the "click outside" listener from firing
-                // because this button is removed from DOM immediately after click (via renderCalendar)
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    selectDate(day);
-                };
+                btn.onclick = (e) => { e.stopPropagation(); selectDate(day); };
                 grid.appendChild(btn);
             }
         }
@@ -784,11 +457,9 @@
         function selectDate(day) {
             const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const formatted = selected.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
             if (selectionMode === 'start') {
                 startDate = selected;
                 document.getElementById('startDateInput').value = formatted;
-                // Auto switch to end date selection
                 setSelectionMode('end');
             } else {
                 endDate = selected;
@@ -803,58 +474,37 @@
                 const endStr = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 selectDateRange(`${startStr} - ${endStr}`);
                 hideCustomRange();
-            } else {
-                 if(startDate) {
-                     const startStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                     selectDateRange(`${startStr} - ...`);
-                     hideCustomRange();
-                 }
             }
         }
 
-        // --- Comparison Mode Logic ---
         function updateComparisonMode(mode) {
             currentComparisonMode = mode;
             updateDashboardMetrics();
         }
 
         function updateDashboardMetrics() {
-            // Target Elements
             const revenueText = document.getElementById('revenueComparisonText');
             const revenuePrev = document.getElementById('revenuePrevValue');
-            
             const attrText = document.getElementById('attrComparisonText');
             const attrPrev = document.getElementById('attrPrevValue');
-            
             const campText = document.getElementById('campaignsComparisonText');
             const campPrev = document.getElementById('campaignsPrevValue');
 
-            // 1. Determine "Previous" label based on Range + Mode
-            let prevLabel = "";
-            
-            if (currentComparisonMode === 'year') {
-                prevLabel = "prev. year";
-            } else {
-                // Period Over Period Logic
+            let prevLabel = currentComparisonMode === 'year' ? "prev. year" : "prev. period";
+            if (currentComparisonMode !== 'year') {
                 if (currentRange.includes("30 Days")) prevLabel = "prev. 30 days";
                 else if (currentRange.includes("90 Days")) prevLabel = "prev. 90 days";
                 else if (currentRange.includes("365 Days")) prevLabel = "prev. 365 days";
                 else if (currentRange.includes("12 Months")) prevLabel = "prev. 12 months";
                 else if (currentRange === "Last Month") prevLabel = "prev. month";
                 else if (currentRange === "Last Year") prevLabel = "prev. year";
-                else prevLabel = "prev. period"; // Catch all for Custom, MTD, etc.
             }
 
-            // 2. Update Previous Value Text
-            // (In a real app, you'd fetch new numbers here. We will simulate static numbers with dynamic labels)
             revenuePrev.innerText = `$751,830 ${prevLabel}`;
             attrPrev.innerText = `$296,700 ${prevLabel}`;
             campPrev.innerText = `12 ${prevLabel}`;
 
-            // 3. Update Percentage Labels
             const suffix = currentComparisonMode === 'period' ? 'PoP' : 'YoY';
-            
-            // Simulating different percentages for Year vs Period
             if (currentComparisonMode === 'period') {
                 revenueText.innerText = `+12% ${suffix}`;
                 attrText.innerText = `+15% ${suffix}`;
@@ -866,12 +516,10 @@
             }
         }
 
-
-        // Initialize Chart
-        // Check if Chart.js is loaded
+        // Chart
         if (typeof Chart !== 'undefined') {
             const ctx = document.getElementById('revenueChart').getContext('2d');
-            const revenueChart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
@@ -880,8 +528,7 @@
                         data: [45000, 52000, 49000, 60000, 58000, 75000],
                         backgroundColor: '#EB5E28',
                         borderRadius: 4
-                    },
-                    {
+                    }, {
                         label: 'Flows',
                         data: [20000, 25000, 28000, 32000, 35000, 42000],
                         backgroundColor: '#1f2937',
@@ -891,51 +538,31 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index', // Shows data for all datasets at this index (the whole month)
-                        intersect: false, // Triggers hover even if not directly over the bar
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            // Customizing to ensure it looks like a clean "flat pop-out"
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             padding: 12,
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 12 },
                             cornerRadius: 8,
                             displayColors: true,
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
+                                    if (label) label += ': ';
                                     const value = context.raw;
-                                    
-                                    // Calculate total for this stack (month) to get percentage
                                     let total = 0;
-                                    context.chart.data.datasets.forEach(ds => {
-                                        total += ds.data[context.dataIndex];
-                                    });
-                                    
+                                    context.chart.data.datasets.forEach(ds => { total += ds.data[context.dataIndex]; });
                                     const percentage = Math.round((value / total) * 100);
-                                    
-                                    // Format currency
-                                    const formattedValue = new Intl.NumberFormat('en-US', { 
-                                        style: 'currency', 
-                                        currency: 'USD',
-                                        maximumFractionDigits: 0 
-                                    }).format(value);
-                                    
+                                    const formattedValue = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
                                     return `${label}${formattedValue} (${percentage}%)`;
                                 }
                             }
                         }
                     },
                     scales: {
-                        y: { grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] }, ticks: { color: '#94a3b8', font: {family: 'Inter'} }, stacked: true },
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: {family: 'Inter'} }, stacked: true }
+                        y: { grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] }, ticks: { color: '#94a3b8' }, stacked: true },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' }, stacked: true }
                     }
                 }
             });
