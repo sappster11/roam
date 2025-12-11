@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Tracker | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+    <style>
+        /* --- PAGE-SPECIFIC TABLE STYLES --- */
+        .table-container {
+            overflow: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+        
+        .tracker-table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .tracker-table th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            box-shadow: 0 1px 0 #e5e7eb;
+        }
+
+        .tracker-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+            background-color: #fff;
+            color: #1f2937;
+            font-size: 0.85rem;
+        }
+
+        /* SECTION HEADER STYLES */
+        .section-header td {
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.75rem 1.5rem;
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            border-left: 4px solid;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: sticky;
+            left: 0;
+            z-index: 15;
+        }
+
+        .section-draft td {
+            background-color: #f3f4f6; 
+            color: #4b5563; 
+            border-color: #e5e7eb; 
+            border-left-color: #9ca3af; 
+        }
+
+        .section-active td {
+            background-color: #fff7ed; 
+            color: #9a3412; 
+            border-color: #fed7aa; 
+            border-left-color: var(--accent-orange); 
+        }
+
+        .section-completed td {
+            background-color: #f0fdf4; 
+            color: #166534; 
+            border-color: #bbf7d0; 
+            border-left-color: #22c55e; 
+        }
+
+        /* --- READ ONLY STYLES --- */
+        .data-text {
+            font-size: 0.85rem;
+            color: #111;
+            line-height: 1.5;
+        }
+        .data-sub {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .text-strong { font-weight: 600; }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+        .stat-label { color: #9ca3af; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; width: 30px; }
+        .stat-val { font-weight: 600; color: #374151; font-family: monospace; }
+        .stat-cr { color: #2563eb; font-weight: 700; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .badge-placement { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+        .badge-kpi { background-color: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+        
+        /* TOOLTIP */
+        .tooltip-container {
+            position: relative;
+            display: inline-flex;
+            margin-left: 0.25rem;
+            color: #9ca3af;
+            cursor: help;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 50; 
+            top: 150%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.75rem;
+            font-weight: 400;
+            text-transform: none;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            white-space: normal;
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #1f2937 transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Calculator Result Box */
+        .calc-box {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+        }
+        .calc-stat { display: flex; justify-content: space-between; margin-bottom: 0.25rem; }
+        .calc-stat span:last-child { font-weight: 700; }
+        
+        .sig-badge {
+            display: block;
+            text-align: center;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        .sig-green { background: #dcfce7; color: #15803d; }
+        .sig-yellow { background: #fef9c3; color: #a16207; }
+        .sig-red { background: #fee2e2; color: #b91c1c; }
+        .sig-gray { background: #f3f4f6; color: #6b7280; }
+    </style>
+</head>
+<body data-page="testing">
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen pt-8 px-8"> 
+        
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header">
+            <div>
+                <h1 class="text-3xl font-bold text-black">Testing Tracker</h1>
