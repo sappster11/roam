@@ -3,69 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account | Roam</title>
-    <script src="favicon.js"></script>
+    <title>Create Account | Roam Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-cream: #FDFCF8;
             --bg-black: #050505;
             --accent-orange: #EB5E28;
+            --border-light: rgba(0,0,0,0.1);
         }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-cream);
             color: var(--bg-black);
+            -webkit-font-smoothing: antialiased;
         }
-        .btn-primary {
-            background-color: var(--accent-orange);
+
+        /* Split Layout */
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+        }
+        @media (min-width: 1024px) {
+            .split-container { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Image Side */
+        .image-side {
+            background-color: var(--bg-black);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+        @media (min-width: 1024px) { .image-side { display: block; } }
+        
+        .login-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        /* Form Side */
+        .form-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        /* Inputs */
+        .input-group { margin-bottom: 1.25rem; }
+        .input-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.375rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(235, 94, 40, 0.1);
+        }
+
+        /* Button */
+        .btn-login {
+            width: 100%;
+            background-color: var(--bg-black);
             color: white;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 0.875rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-top: 1rem;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px -10px rgba(235, 94, 40, 0.6);
+        .btn-login:hover {
+            background-color: #333;
+            transform: translateY(-1px);
         }
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
-        input:-webkit-autofill:active{
-            -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important;
-            -webkit-text-fill-color: #000 !important;
+
+        /* Logo */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--bg-black);
+            text-decoration: none;
+        }
+        .logo-dot { width: 12px; height: 12px; background: var(--accent-orange); border-radius: 50%; }
+
+        /* Back Link */
+        .back-link {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 0.875rem;
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--bg-black); }
+
+        /* Success Message State */
+        .success-state {
+            display: none;
+            text-align: center;
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #ECFDF5;
+            color: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1.5rem auto;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-hidden">
-    
-    <div class="absolute inset-0 z-0 opacity-40" 
-         style="background-image: radial-gradient(#d4d4d4 1px, transparent 1px); background-size: 24px 24px;">
+<body>
+
+    <div class="split-container">
+        
+        <!-- Form Side -->
+        <div class="form-side">
+            <a href="main.html" class="back-link">
+                &larr; Back to Home
+            </a>
+
+            <div class="login-card">
+                <a href="main.html" class="logo">
+                    <span class="logo-dot"></span>
+                    Roam.
+                </a>
+
+                <!-- Signup Form -->
+                <div id="signup-form-container">
+                    <h1 class="text-3xl font-bold mb-2">Create Account</h1>
+                    <p class="text-gray-500 mb-8">Initialize your Command Center access.</p>
+
+                    <form onsubmit="handleSignup(event)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="input-group">
+                                <label class="input-label" for="first-name">First Name</label>
+                                <input type="text" id="first-name" class="input-field" placeholder="Jane" required>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label" for="last-name">Last Name</label>
+                                <input type="text" id="last-name" class="input-field" placeholder="Doe" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label" for="email">Work Email</label>
+                            <input type="email" id="email" class="input-field" placeholder="name@company.com" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label" for="password">Password</label>
+                            <input type="password" id="password" class="input-field" placeholder="Create a strong password" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label" for="company">Company Name</label>
+                            <input type="text" id="company" class="input-field" placeholder="Brand Inc." required>
+                        </div>
+
+                        <button type="submit" class="btn-login">Create Account</button>
+                    </form>
+
+                    <p class="mt-8 text-center text-sm text-gray-500">
+                        Already have an account? <a href="login.html" class="text-orange-600 hover:text-orange-700 font-medium">Log in</a>
+                    </p>
+                </div>
+
+                <!-- Success State (Hidden by default) -->
+                <div id="success-message" class="success-state">
+                    <div class="success-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-4">Request Received</h2>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        Your account has been created and is pending verification. Our team will map your data and activate your dashboard within 24 hours.
+                    </p>
+                    <a href="main.html" class="btn-login inline-block w-auto px-8">Return to Home</a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Image Side (Desktop Only) -->
+        <div class="image-side">
+            <!-- Abstract/Tech Image matching brand vibe -->
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" class="login-image" alt="Data Visualization">
+            <div class="absolute inset-0 bg-black/50"></div>
+            <div class="absolute bottom-12 left-12 text-white max-w-md">
+                <p class="text-xl font-medium leading-relaxed">"The Roam dashboard is the only tab I keep open all day. It's absolute clarity."</p>
+                <p class="mt-4 text-sm text-gray-300 font-bold uppercase tracking-widest">Director of Ecomm, Kinetic</p>
+            </div>
+        </div>
+
     </div>
 
-    <nav class="w-full p-6 z-10 flex justify-between items-center">
-        <a href="main.html" class="text-xl font-extrabold tracking-tight text-black flex items-center gap-2 hover:opacity-70 transition-opacity">
-            <span class="w-2 h-2 bg-orange-600 rounded-full"></span>
-            Roam.
-        </a>
-        <a href="main.html" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors">
-            &larr; Return to HQ
-        </a>
-    </nav>
+    <!-- FontAwesome for Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <main class="flex-grow flex items-center justify-center p-6 pb-20 z-10">
-        <div class="w-full max-w-md">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
+
+        async function handleSignup(e) {
+            e.preventDefault();
             
-            <div class="mb-10 text-center">
-                <p class="text-orange-600 font-mono text-xs mb-4 animate-pulse">:: NEW OPERATIVE ::</p>
-                <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-2 text-black">Join the Network.</h1>
-                <p class="text-gray-600">Create your credentials to request access.</p>
-            </div>
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const company = document.getElementById('company').value;
+            const btn = document.querySelector('.btn-login');
 
-            <div class="bg-white border border-black/5 p-8 md:p-10 rounded-xl shadow-2xl shadow-gray-200/50 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-600 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            btn.textContent = 'Creating Account...';
+            btn.style.opacity = '0.7';
 
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Email Protocol</label>
-                        <input type="email" id="email" 
-                            class="w-full bg-gray-50 border border-gray-200 p-4 text-sm text-black focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600 transition-all placeholder-gray-400 rounded-sm"
+            // 1. Create User in Supabase Auth
+            const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        first_name: firstName,
+                        last_name: lastName,
+                        company: company,
+                        status: 'pending' // Flag for manual approval
+                    }
+                }
+            });
+
+            if (error) {
+                alert("Error: " + error.message);
+                btn.textContent = 'Create Account';
+                btn.style.opacity = '1';
+            } else {
+                // 2. Show Success State (Manual Verification Flow)
+                document.getElementById('signup-form-container').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
