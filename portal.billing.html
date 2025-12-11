@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+</head>
+<body data-page="billing">
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen pt-8 px-8"> 
+        
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header">
+            <div>
+                <h1 class="text-3xl font-bold text-black">Billing</h1>
+                <p class="text-xs text-gray-500 mt-1">Manage invoices and payment methods.</p>
+            </div>
+        </header>
+
+        <!-- Main Content Area: Redirect Card -->
+        <div class="flex-grow flex flex-col items-center justify-center pb-20">
+            
+            <div class="bg-white border border-gray-200 rounded-xl p-10 max-w-lg w-full text-center shadow-sm">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-6">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-gray-900 mb-3">Billing Portal</h2>
+                <p class="text-sm text-gray-600 mb-8 leading-relaxed">
+                    To ensure the highest level of security and compliance, all invoices, payment history, and billing details are hosted on our dedicated secure platform.
+                </p>
+
+                <a href="https://invoiced.com" target="_blank" class="block w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition-all mb-6 flex items-center justify-center gap-2">
+                    Go to Invoiced.com <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                </a>
+
+                <div class="border-t border-gray-100 pt-6">
+                    <p class="text-xs text-gray-500 mb-1">Have questions about an invoice?</p>
+                    <a href="mailto:ar@goroam.cc" class="text-sm font-bold text-orange-600 hover:text-orange-700 flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-envelope"></i> ar@goroam.cc
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+</body>
+</html>
