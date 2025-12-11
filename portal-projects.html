@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Status | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+    <style>
+        /* --- PAGE-SPECIFIC KANBAN STYLES --- */
+        .kanban-board {
+            display: flex;
+            overflow-x: auto;
+            height: 100%;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+        }
+        
+        .kanban-column {
+            min-width: 320px;
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            border-right: 1px solid #e5e7eb;
+            background-color: rgba(255,255,255,0.3);
+            padding: 0 1rem;
+        }
+        .kanban-column:last-child {
+            border-right: none;
+        }
+
+        .kanban-header {
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            background-color: transparent; 
+        }
+
+        .kanban-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            transition: transform 0.1s, box-shadow 0.1s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border-color: #d1d5db;
+        }
+
+        .card-strip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        .strip-email { background-color: #111; }
+        .strip-sms { background-color: var(--accent-orange); }
+
+        .kanban-board::-webkit-scrollbar { height: 8px; }
+        .kanban-board::-webkit-scrollbar-track { background: transparent; }
+        .kanban-board::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+        .kanban-board::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.2); }
+
+        .card-link {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #f9fafb;
+            color: #666;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .card-link:hover {
+            background: #fff;
+            border-color: #d1d5db;
+            color: #111;
+        }
+
+        /* --- POPOVER CARD STYLES --- */
+        #projectPopover {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        .popover-hidden { opacity: 0; pointer-events: none; transform: scale(0.98); }
+        .popover-visible { opacity: 1; pointer-events: auto; transform: scale(1); }
+    </style>
+</head>
+<body data-page="projects">
+
+    <!-- Project Card Popover -->
+    <div id="projectPopover" class="fixed z-[100] popover-hidden bg-white rounded-lg w-[400px] overflow-hidden shadow-xl border border-gray-100">
+        <div id="popoverStrip" class="absolute top-0 bottom-0 left-0 w-1.5 bg-black"></div>
+        
+        <div class="px-5 pt-4 pb-2 pl-6">
+            <div class="flex justify-between items-start mb-2">
+                <span id="popoverStatus" class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">In Progress</span>
+                <button id="popoverCloseBtn" onclick="unlockPopover()" class="text-gray-400 hover:text-black hidden transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-start gap-3">
+                <div id="popoverChannelIcon" class="mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-gray-100 text-gray-600"></div>
+                <h3 id="popoverTitle" class="text-base font-bold text-gray-900 leading-tight">Campaign Title</h3>
+            </div>
+        </div>
+
+        <div class="px-5 py-3 pl-6 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-5 flex justify-center text-gray-400"><i class="fa-regular fa-calendar text-xs"></i></div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase leading-none">Due Date</p>
+                    <p id="popoverDueDate" class="text-xs font-medium text-gray-800 leading-tight mt-0.5">Nov 15, 2025</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="w-5 flex justify-center text-gray-400"><i class="fa-solid fa-bars-progress text-xs"></i></div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase leading-none">Current Phase</p>
+                    <p id="popoverPhase" class="text-xs font-medium text-gray-800 leading-tight mt-0.5">Copywriting</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-5 py-3 pl-6 bg-gray-50 border-t border-gray-100">
+             <div class="flex gap-2 mb-0" id="popoverLinks"></div>
+             <div id="popoverActions" class="mt-3 pt-3 border-t border-gray-200 hidden"></div>
+        </div>
+    </div>
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen">
+        
+        <div class="mobile-header">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header">
+            <h1 class="text-3xl font-bold text-black">Project Status</h1>
+            <div class="flex items-center gap-4 h-10">
+                <div class="flex items-center gap-3 px-3 h-full bg-white border border-gray-200 rounded-md shadow-sm box-border">
+                    <div class="w-2 h-2 rounded-full bg-pink-500 flex-shrink-0"></div>
+                    <div class="flex flex-col justify-center">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 leading-none mb-0.5">Integration</span>
+                        <a href="#" class="text-xs font-bold text-gray-700 leading-none hover:text-black hover:underline transition-colors">Asana Board</a>
+                    </div>
+                </div>
+                <button class="px-4 h-full bg-black text-white rounded text-sm font-bold hover:bg-gray-800 transition-colors shadow-sm flex items-center">
+                    <i class="fa-solid fa-plus mr-2"></i> New Ticket
+                </button>
+            </div>
+        </header>
+
+        <!-- KANBAN BOARD -->
+        <div class="kanban-board flex-grow" id="kanbanBoard">
+            
+            <!-- 1. IN PROGRESS -->
+            <div class="kanban-column">
+                <div class="kanban-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-800">In Progress</span>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">3</span>
+                    </div>
+                </div>
+                <div class="kanban-card group" data-id="1">
+                    <div class="card-strip strip-email"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email</span>
+                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 rounded">In Design</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-3 leading-snug">Win-Back Series V2</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link" title="Copy"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                                <span class="card-link" title="Prompt"><i class="fa-solid fa-terminal text-green-600"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i> Nov 14</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kanban-card group" data-id="2">
+                    <div class="card-strip strip-sms"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SMS</span>
+                            <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 rounded">In Copy</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-3 leading-snug">Post-Purchase Upsell</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link" title="Copy"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-orange-600"><i class="fa-regular fa-clock mr-1"></i> Due Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ON HOLD -->
+            <div class="kanban-column">
+                <div class="kanban-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-800">On Hold</span>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">1</span>
+                    </div>
+                </div>
+                <div class="kanban-card group opacity-75 grayscale" data-id="3">
+                    <div class="card-strip strip-email"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email</span>
+                            <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 rounded">Paused</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-3 leading-snug">Referral Program Launch</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link" title="Copy"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i> TBD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. READY FOR REVIEW -->
+            <div class="kanban-column">
+                <div class="kanban-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-800">Ready for Review</span>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">2</span>
+                    </div>
+                </div>
+                <div class="kanban-card group" data-id="4">
+                    <div class="card-strip strip-email"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email</span>
+                            <span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-1.5 rounded">Awaiting Approval</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-3 leading-snug">Black Friday Tease</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                                <span class="card-link"><i class="fa-brands fa-figma text-purple-600"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i> Nov 12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. APPROVED -->
+            <div class="kanban-column">
+                <div class="kanban-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-800">Approved</span>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">1</span>
+                    </div>
+                </div>
+                <div class="kanban-card group" data-id="5">
+                    <div class="card-strip strip-sms"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SMS</span>
+                            <span class="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 rounded">Ready to Send</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-3 leading-snug">Flash Sale (4h)</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400"><i class="fa-regular fa-clock mr-1"></i> Nov 11</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. COMPLETED -->
+            <div class="kanban-column">
+                <div class="kanban-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-800">Completed</span>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">1</span>
+                    </div>
+                </div>
+                <div class="kanban-card group opacity-60 bg-gray-50" data-id="6">
+                    <div class="card-strip bg-gray-300"></div>
+                    <div class="pl-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email</span>
+                            <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-1.5 rounded">Sent</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-500 mb-3 leading-snug line-through">New Arrival Drop</h4>
+                        <div class="flex justify-between items-end">
+                            <div class="flex gap-2">
+                                <span class="card-link"><i class="fa-solid fa-file-lines text-blue-500"></i></span>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400">Nov 01</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+
+    <!-- Page-specific scripts -->
+    <script>
+        // Mock Data Database
+        const projectData = {
+            '1': { id: '1', title: 'Win-Back Series V2', type: 'email', status: 'In Design', dueDate: 'Nov 14, 2025', phase: 'Design', links: { copy: true, prompt: true, figma: false } },
+            '2': { id: '2', title: 'Post-Purchase Upsell', type: 'sms', status: 'In Copy', dueDate: 'Today', phase: 'Copywriting', links: { copy: true, prompt: false, figma: false } },
+            '3': { id: '3', title: 'Referral Program Launch', type: 'email', status: 'Paused', dueDate: 'TBD', phase: 'Planning', links: { copy: true, prompt: false, figma: false } },
+            '4': { id: '4', title: 'Black Friday Tease', type: 'email', status: 'Awaiting Approval', dueDate: 'Nov 12, 2025', phase: 'Review', links: { copy: true, prompt: false, figma: true } },
+            '5': { id: '5', title: 'Flash Sale (4h)', type: 'sms', status: 'Ready to Send', dueDate: 'Nov 11, 2025', phase: 'Scheduling', links: { copy: true, prompt: false, figma: false } },
+            '6': { id: '6', title: 'New Arrival Drop', type: 'email', status: 'Sent', dueDate: 'Nov 01, 2025', phase: 'Complete', links: { copy: true, prompt: false, figma: false } }
+        };
+
+        const popover = document.getElementById('projectPopover');
+        const popoverCloseBtn = document.getElementById('popoverCloseBtn');
+        let isPopoverLocked = false;
+
+        function updatePopoverContent(data) {
+            document.getElementById('popoverTitle').innerText = data.title;
+            document.getElementById('popoverDueDate').innerText = data.dueDate;
+            document.getElementById('popoverPhase').innerText = data.phase;
+            document.getElementById('popoverStatus').innerText = data.status;
+
+            const strip = document.getElementById('popoverStrip');
+            const iconContainer = document.getElementById('popoverChannelIcon');
+            if (data.type === 'email') {
+                strip.className = 'absolute top-0 bottom-0 left-0 w-1.5 bg-black';
+                iconContainer.className = 'mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-gray-100 text-gray-800';
+                iconContainer.innerHTML = '<i class="fa-solid fa-envelope text-xs"></i>';
+            } else {
+                strip.className = 'absolute top-0 bottom-0 left-0 w-1.5 bg-orange-600';
+                iconContainer.className = 'mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-orange-50 text-orange-600';
+                iconContainer.innerHTML = '<i class="fa-solid fa-comment-sms text-xs"></i>';
+            }
+
+            const linkContainer = document.getElementById('popoverLinks');
+            linkContainer.innerHTML = '';
+            
+            if (data.links.copy) {
+                linkContainer.innerHTML += `<a href="#" class="flex-1 text-center py-2 rounded border border-gray-200 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-colors group"><i class="fa-solid fa-file-lines mr-1.5 text-blue-600 group-hover:text-blue-700"></i> Copy</a>`;
+            }
+            if (data.links.figma) {
+                linkContainer.innerHTML += `<a href="#" class="flex-1 text-center py-2 rounded border border-gray-200 bg-white text-xs font-bold text-gray-600 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition-colors group"><i class="fa-brands fa-figma mr-1.5 text-purple-600 group-hover:text-purple-700"></i> Figma</a>`;
+            }
+            if (data.links.prompt) {
+                linkContainer.innerHTML += `<a href="#" class="flex-1 text-center py-2 rounded border border-gray-200 bg-white text-xs font-bold text-gray-600 hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition-colors group"><i class="fa-solid fa-terminal mr-1.5 text-green-600 group-hover:text-green-700"></i> Prompt</a>`;
+            }
+
+            const actionsContainer = document.getElementById('popoverActions');
+            if (data.status === 'Awaiting Approval') {
+                actionsContainer.classList.remove('hidden');
+                actionsContainer.innerHTML = `
+                    <div class="flex gap-3" id="initialActions">
+                        <button onclick="approveCard('${data.id}')" class="flex-1 py-2.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check"></i> Approve
+                        </button>
+                        <button onclick="triggerRevisionCheck()" class="flex-1 py-2.5 rounded-lg border border-gray-200 text-gray-600 bg-white hover:border-red-200 hover:bg-red-50 hover:text-red-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> Request Revisions
+                        </button>
+                    </div>
+                    <div id="revisionCheck" class="hidden">
+                        <p class="text-[10px] font-bold text-red-600 mb-2 bg-red-50 p-2.5 rounded-lg border border-red-100 flex items-start gap-2">
+                            <i class="fa-solid fa-circle-exclamation mt-0.5"></i> 
+                            <span>Please confirm you have left specific comments in the Figma or CopyDoc file.</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <button onclick="cancelRevision()" class="px-3 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors">Cancel</button>
+                            <button onclick="confirmRevision('${data.id}')" class="flex-1 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-xs font-bold transition-colors shadow-sm">Confirm & Submit</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                actionsContainer.classList.add('hidden');
+                actionsContainer.innerHTML = '';
+            }
+        }
+
+        function triggerRevisionCheck() {
+            document.getElementById('initialActions').classList.add('hidden');
+            document.getElementById('revisionCheck').classList.remove('hidden');
+        }
+
+        function cancelRevision() {
+            document.getElementById('revisionCheck').classList.add('hidden');
+            document.getElementById('initialActions').classList.remove('hidden');
+        }
+
+        function confirmRevision(id) {
+            const actionsContainer = document.getElementById('popoverActions');
+            actionsContainer.innerHTML = `<div class="w-full py-2 bg-red-50 text-red-700 text-xs font-bold text-center rounded border border-red-100"><i class="fa-solid fa-check mr-1"></i> Returned for Revisions</div>`;
+            setTimeout(() => unlockPopover(), 1500);
+        }
+
+        function approveCard(id) {
+            const actionsContainer = document.getElementById('popoverActions');
+            actionsContainer.innerHTML = `<div class="w-full py-2 bg-green-50 text-green-700 text-xs font-bold text-center rounded border border-green-100"><i class="fa-solid fa-check mr-1"></i> Approved! Moving to Approved.</div>`;
+            setTimeout(() => unlockPopover(), 1500);
+        }
+
+        function showPopover(event, id) {
+            if (isPopoverLocked) return;
+            const data = projectData[id];
+            if(!data) return;
+            updatePopoverContent(data);
+            popoverCloseBtn.classList.add('hidden');
+            positionPopover(event.target);
+            popover.classList.remove('popover-hidden');
+            popover.classList.add('popover-visible');
+        }
+
+        function hidePopover() {
+            if (isPopoverLocked) return;
+            popover.classList.remove('popover-visible');
+            popover.classList.add('popover-hidden');
+        }
+
+        function lockPopover(event, id) {
+            const data = projectData[id];
+            if(!data) return;
+            updatePopoverContent(data);
+            positionPopover(event.currentTarget);
+            isPopoverLocked = true;
+            popover.classList.remove('popover-hidden');
+            popover.classList.add('popover-visible');
+            popoverCloseBtn.classList.remove('hidden');
+        }
+
+        function unlockPopover() {
+            isPopoverLocked = false;
+            hidePopover();
+        }
+
+        function positionPopover(target) {
+            const rect = target.getBoundingClientRect();
+            const popoverWidth = 400;
+            const windowWidth = window.innerWidth;
+            let left = rect.right + 10 + window.scrollX;
+            let top = rect.top + window.scrollY;
+            if (left + popoverWidth > windowWidth - 20) {
+                left = (rect.left + window.scrollX) - popoverWidth - 10;
+            }
+            popover.style.top = `${top}px`;
+            popover.style.left = `${left}px`;
+        }
+
+        document.querySelectorAll('.kanban-card').forEach(card => {
+            const id = card.getAttribute('data-id');
+            card.addEventListener('mouseenter', (e) => showPopover(e, id));
+            card.addEventListener('mouseleave', hidePopover);
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lockPopover(e, id);
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (isPopoverLocked) {
+                if (!popover.contains(event.target) && !event.target.closest('.kanban-card')) {
+                    unlockPopover();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
