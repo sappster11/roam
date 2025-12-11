@@ -21,45 +21,21 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Split Layout */
-        .split-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            min-height: 100vh;
-        }
-        @media (min-width: 1024px) {
-            .split-container { grid-template-columns: 1fr 1fr; }
-        }
-
-        /* Image Side */
-        .image-side {
-            background-color: var(--bg-black);
-            position: relative;
-            overflow: hidden;
-            display: none;
-        }
-        @media (min-width: 1024px) { .image-side { display: block; } }
-        
-        .login-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
-        }
-
-        /* Form Side */
-        .form-side {
+        /* Centered Layout */
+        .main-container {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
-            position: relative;
+            min-height: 100vh;
+            padding: 1rem;
         }
 
-        .login-card {
+        /* Form Container */
+        .form-wrapper {
             width: 100%;
-            max-width: 440px;
+            max-width: 480px;
+            background: transparent;
+            position: relative;
         }
 
         /* Inputs */
@@ -87,11 +63,15 @@
             border-color: var(--accent-orange);
             box-shadow: 0 0 0 3px rgba(235, 94, 40, 0.1);
         }
+        .input-field.error {
+            border-color: #EF4444;
+            background-color: #FEF2F2;
+        }
 
         /* Button */
         .btn-login {
             width: 100%;
-            background-color: var(--bg-black);
+            background-color: var(--accent-orange);
             color: white;
             padding: 0.875rem;
             border-radius: 0.375rem;
@@ -100,7 +80,7 @@
             margin-top: 1rem;
         }
         .btn-login:hover {
-            background-color: #333;
+            background-color: #cf4f1f;
             transform: translateY(-1px);
         }
 
@@ -111,6 +91,7 @@
             letter-spacing: -0.04em;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
             margin-bottom: 2.5rem;
             color: var(--bg-black);
@@ -121,8 +102,8 @@
         /* Back Link */
         .back-link {
             position: absolute;
-            top: 2rem;
-            left: 2rem;
+            top: -3rem;
+            left: 0;
             font-size: 0.875rem;
             color: #888;
             text-decoration: none;
@@ -132,6 +113,14 @@
             transition: color 0.2s;
         }
         .back-link:hover { color: var(--bg-black); }
+
+        /* Error Message */
+        .error-text {
+            color: #EF4444;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
 
         /* Success Message State */
         .success-state {
@@ -154,84 +143,98 @@
 </head>
 <body>
 
-    <div class="split-container">
+    <div class="main-container">
         
-        <!-- Form Side -->
-        <div class="form-side">
+        <div class="form-wrapper">
             <a href="main.html" class="back-link">
                 &larr; Back to Home
             </a>
 
-            <div class="login-card">
+            <div class="text-center">
                 <a href="main.html" class="logo">
                     <span class="logo-dot"></span>
                     Roam.
                 </a>
+            </div>
 
-                <!-- Signup Form -->
-                <div id="signup-form-container">
+            <!-- Signup Form -->
+            <div id="signup-form-container">
+                <div class="text-center mb-8">
                     <h1 class="text-3xl font-bold mb-2">Create Account</h1>
-                    <p class="text-gray-500 mb-8">Initialize your Command Center access.</p>
-
-                    <form onsubmit="handleSignup(event)">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="input-group">
-                                <label class="input-label" for="first-name">First Name</label>
-                                <input type="text" id="first-name" class="input-field" placeholder="Jane" required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label" for="last-name">Last Name</label>
-                                <input type="text" id="last-name" class="input-field" placeholder="Doe" required>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="input-label" for="email">Work Email</label>
-                            <input type="email" id="email" class="input-field" placeholder="name@company.com" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="input-label" for="password">Password</label>
-                            <input type="password" id="password" class="input-field" placeholder="Create a strong password" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="input-label" for="company">Company Name</label>
-                            <input type="text" id="company" class="input-field" placeholder="Brand Inc." required>
-                        </div>
-
-                        <button type="submit" class="btn-login">Create Account</button>
-                    </form>
-
-                    <p class="mt-8 text-center text-sm text-gray-500">
-                        Already have an account? <a href="login.html" class="text-orange-600 hover:text-orange-700 font-medium">Log in</a>
-                    </p>
+                    <p class="text-gray-500">Initialize your Command Center access.</p>
                 </div>
 
-                <!-- Success State (Hidden by default) -->
-                <div id="success-message" class="success-state">
-                    <div class="success-icon">
-                        <i class="fa-solid fa-check"></i>
+                <form onsubmit="handleSignup(event)">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label class="input-label" for="first-name">First Name</label>
+                            <input type="text" id="first-name" class="input-field" placeholder="Jane" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="last-name">Last Name</label>
+                            <input type="text" id="last-name" class="input-field" placeholder="Doe" required>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold mb-4">Request Received</h2>
-                    <p class="text-gray-600 mb-8 leading-relaxed">
-                        Your account has been created and is pending verification. Our team will map your data and activate your dashboard within 24 hours.
-                    </p>
-                    <a href="main.html" class="btn-login inline-block w-auto px-8">Return to Home</a>
+
+                    <div class="input-group">
+                        <label class="input-label" for="email">Work Email</label>
+                        <input type="email" id="email" class="input-field" placeholder="name@company.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="company">Company Name</label>
+                        <input type="text" id="company" class="input-field" placeholder="Brand Inc." required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group relative group">
+                            <label class="input-label" for="password">Password</label>
+                            <input type="password" id="password" class="input-field" placeholder="Create password" required>
+                            
+                            <!-- Password Requirements Tooltip -->
+                            <div id="password-tooltip" class="absolute top-full left-0 mt-2 w-full bg-white p-4 rounded-lg shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100 transform transition-all duration-300 opacity-0 invisible translate-y-2 z-20">
+                                <div class="absolute -top-2 left-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                                <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2">Requirements</h4>
+                                <ul class="text-xs text-gray-500 space-y-2">
+                                    <li id="req-length" class="flex items-center gap-2 transition-colors duration-200">
+                                        <div class="w-4 flex justify-center"><i class="fa-regular fa-circle text-[10px]"></i></div> 8+ characters
+                                    </li>
+                                    <li id="req-number" class="flex items-center gap-2 transition-colors duration-200">
+                                        <div class="w-4 flex justify-center"><i class="fa-regular fa-circle text-[10px]"></i></div> At least 1 number
+                                    </li>
+                                    <li id="req-upper" class="flex items-center gap-2 transition-colors duration-200">
+                                        <div class="w-4 flex justify-center"><i class="fa-regular fa-circle text-[10px]"></i></div> 1 uppercase letter
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="confirm-password">Confirm Password</label>
+                            <input type="password" id="confirm-password" class="input-field" placeholder="Confirm password" required>
+                            <p id="password-error" class="error-text">Passwords do not match</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">Create Account</button>
+                </form>
+
+                <p class="mt-8 text-center text-sm text-gray-500">
+                    Already have an account? <a href="login.html" class="text-orange-600 hover:text-orange-700 font-medium">Log in</a>
+                </p>
+            </div>
+
+            <!-- Success State (Hidden by default) -->
+            <div id="success-message" class="success-state">
+                <div class="success-icon">
+                    <i class="fa-solid fa-check"></i>
                 </div>
-
+                <h2 class="text-2xl font-bold mb-4">Request Received</h2>
+                <p class="text-gray-600 mb-8 leading-relaxed">
+                    Your account has been created and is pending verification. Our team will map your data and activate your dashboard within 24 hours.
+                </p>
+                <a href="main.html" class="btn-login inline-block w-auto px-8">Return to Home</a>
             </div>
-        </div>
 
-        <!-- Image Side (Desktop Only) -->
-        <div class="image-side">
-            <!-- Abstract/Tech Image matching brand vibe -->
-            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" class="login-image" alt="Data Visualization">
-            <div class="absolute inset-0 bg-black/50"></div>
-            <div class="absolute bottom-12 left-12 text-white max-w-md">
-                <p class="text-xl font-medium leading-relaxed">"The Roam dashboard is the only tab I keep open all day. It's absolute clarity."</p>
-                <p class="mt-4 text-sm text-gray-300 font-bold uppercase tracking-widest">Director of Ecomm, Kinetic</p>
-            </div>
         </div>
 
     </div>
@@ -246,20 +249,114 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
 
+        // Elements
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirm-password');
+        const errorText = document.getElementById('password-error');
+        const tooltip = document.getElementById('password-tooltip'); // Changed from reqList
+
+        // Requirement List Items
+        const reqLength = document.getElementById('req-length');
+        const reqNumber = document.getElementById('req-number');
+        const reqUpper = document.getElementById('req-upper');
+
+        // Helper: Update validation UI for a single requirement
+        function updateRequirement(element, isValid) {
+            const icon = element.querySelector('i');
+            if (isValid) {
+                element.classList.remove('text-gray-500');
+                element.classList.add('text-green-600', 'font-medium');
+                icon.className = 'fa-solid fa-check text-[10px]';
+            } else {
+                element.classList.add('text-gray-500');
+                element.classList.remove('text-green-600', 'font-medium');
+                icon.className = 'fa-regular fa-circle text-[10px]';
+            }
+        }
+
+        // Logic: Check password strength
+        function validateStrength() {
+            const val = passwordInput.value;
+            
+            const isLength = val.length >= 8;
+            const isNumber = /\d/.test(val);
+            const isUpper = /[A-Z]/.test(val);
+
+            updateRequirement(reqLength, isLength);
+            updateRequirement(reqNumber, isNumber);
+            updateRequirement(reqUpper, isUpper);
+
+            return isLength && isNumber && isUpper;
+        }
+
+        // Logic: Check if passwords match
+        function validateMatch() {
+            const p1 = passwordInput.value;
+            const p2 = confirmInput.value;
+            
+            // Only show error if confirm field has text and doesn't match
+            if (p2 && p1 !== p2) {
+                errorText.style.display = 'block';
+                confirmInput.classList.add('error');
+            } else {
+                errorText.style.display = 'none';
+                confirmInput.classList.remove('error');
+            }
+        }
+
+        // Tooltip Visibility Logic
+        passwordInput.addEventListener('focus', () => {
+            tooltip.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+            tooltip.classList.add('opacity-100', 'visible', 'translate-y-0');
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            // Optional: Hide immediately on blur, or keep if invalid? 
+            // Hiding is cleaner for UI
+            tooltip.classList.add('opacity-0', 'invisible', 'translate-y-2');
+            tooltip.classList.remove('opacity-100', 'visible', 'translate-y-0');
+        });
+
+        // Event Listeners
+        passwordInput.addEventListener('input', () => {
+            validateStrength();
+            if (confirmInput.value) validateMatch();
+        });
+        
+        confirmInput.addEventListener('input', validateMatch);
+
+        // Submit Handler
         async function handleSignup(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const password = passwordInput.value;
+            const confirmPassword = confirmInput.value;
             const firstName = document.getElementById('first-name').value;
             const lastName = document.getElementById('last-name').value;
             const company = document.getElementById('company').value;
             const btn = document.querySelector('.btn-login');
 
+            // 1. Strict Requirement Check
+            if (!validateStrength()) {
+                // Shake animation or focus could go here
+                alert("Please ensure your password meets all requirements: 8+ chars, 1 number, 1 uppercase.");
+                passwordInput.focus();
+                return;
+            }
+
+            // 2. Strict Match Check
+            if (password !== confirmPassword) {
+                errorText.style.display = 'block';
+                confirmInput.classList.add('error');
+                confirmInput.focus();
+                return;
+            }
+
             btn.textContent = 'Creating Account...';
             btn.style.opacity = '0.7';
 
-            // 1. Create User in Supabase Auth
+            // 3. Create User in Supabase Auth
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -278,7 +375,7 @@
                 btn.textContent = 'Create Account';
                 btn.style.opacity = '1';
             } else {
-                // 2. Show Success State (Manual Verification Flow)
+                // 4. Show Success State
                 document.getElementById('signup-form-container').style.display = 'none';
                 document.getElementById('success-message').style.display = 'block';
             }
