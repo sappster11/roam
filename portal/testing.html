@@ -52,7 +52,6 @@
             font-size: 0.85rem;
         }
 
-        /* SECTION HEADER STYLES */
         .section-header td {
             font-weight: 800;
             font-size: 0.85rem;
@@ -88,7 +87,6 @@
             border-left-color: #22c55e; 
         }
 
-        /* --- READ ONLY STYLES --- */
         .data-text {
             font-size: 0.85rem;
             color: #111;
@@ -122,7 +120,6 @@
         .badge-placement { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
         .badge-kpi { background-color: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
         
-        /* TOOLTIP */
         .tooltip-container {
             position: relative;
             display: inline-flex;
@@ -167,7 +164,6 @@
             opacity: 1;
         }
         
-        /* Calculator Result Box */
         .calc-box {
             padding: 0.75rem;
             border-radius: 0.375rem;
@@ -197,7 +193,7 @@
 <body data-page="testing">
 
     <!-- Nav loads automatically via portal-nav.js -->
-<script src="/portal-nav.js"></script>
+
     <!-- Main Content -->
     <main class="flex flex-col h-screen pt-8 px-8"> 
         
@@ -211,3 +207,308 @@
         <header class="desktop-header">
             <div>
                 <h1 class="text-3xl font-bold text-black">Testing Tracker</h1>
+                <p class="text-xs text-gray-500 mt-1">Live results synced from Master_Data_Source.csv</p>
+            </div>
+            <div class="flex items-center gap-4 h-10">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-sm" title="Sync Status: Active">
+                    <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)] animate-pulse"></div>
+                    <span class="text-xs font-bold text-gray-600">Automatic Sync Enabled</span>
+                </div>
+                <button class="px-4 h-full bg-black text-white rounded text-sm font-bold hover:bg-gray-800 transition-colors shadow-sm flex items-center">
+                    <i class="fa-solid fa-plus mr-2"></i> New Test
+                </button>
+            </div>
+        </header>
+
+        <!-- Testing Tracker Table -->
+        <div class="flex-grow overflow-hidden pb-6">
+            <div class="table-container">
+                <table class="tracker-table">
+                    <thead>
+                        <tr>
+                            <th class="w-48">
+                                Date Range 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">The duration the test has been active in market.</span></span>
+                            </th>
+                            <th class="w-64">
+                                Test Name 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Experiment identifier.</span></span>
+                            </th>
+                            <th class="w-16 text-center">
+                                Vars 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Total variations including Control.</span></span>
+                            </th>
+                            <th class="w-80">
+                                Hypothesis 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">The expected outcome being tested against.</span></span>
+                            </th>
+                            <th class="w-32">
+                                Placement 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Channel or location of the test.</span></span>
+                            </th>
+                            <th class="w-24">
+                                KPI 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Primary success metric.</span></span>
+                            </th>
+                            <th class="w-24">
+                                Sample 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Total participants (N).</span></span>
+                            </th>
+                            <th class="w-32 bg-gray-50 border-l border-gray-200">
+                                Control (A) 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Baseline data. V = Visitors/Recipients, C = Conversions.</span></span>
+                            </th>
+                            <th class="w-32 bg-gray-50">
+                                Variant (B) 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Variation 1 metrics.</span></span>
+                            </th>
+                            <th class="w-32 bg-gray-50">
+                                Variant (C) 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Variation 2 metrics.</span></span>
+                            </th>
+                            <th class="w-32 bg-gray-50 border-r border-gray-200">
+                                Variant (D) 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Variation 3 metrics.</span></span>
+                            </th>
+                            <th class="w-64">
+                                Significance 
+                                <span class="tooltip-container"><i class="fa-solid fa-circle-info"></i><span class="tooltip-text">Statistical confidence based on Z-score comparison of Best Variant vs Control.</span></span>
+                            </th>
+                            <th class="w-16 text-center">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trackerBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="/portal-nav.js"></script>
+
+    <!-- Page-specific scripts -->
+    <script>
+        const sections = ['Draft', 'Active', 'Completed']; 
+        
+        const tests = [
+            {
+                id: 1,
+                status: 'Draft',
+                startDate: 'Dec 01, 2025',
+                endDate: 'Dec 31, 2025',
+                name: 'Welcome Series Offer',
+                variants: 2,
+                hypothesis: 'A fixed dollar amount ($10 off) will convert better than a percentage (10% off) for AOV under $100.',
+                placement: 'Pop-up/Form',
+                kpi: 'Sign-up Rate',
+                sample: 0,
+                control: { visitors: 0, conversions: 0 },
+                variantB: { visitors: 0, conversions: 0 },
+                link: '#'
+            },
+            {
+                id: 2,
+                status: 'Active', 
+                startDate: 'Nov 01, 2025',
+                endDate: 'Nov 15, 2025',
+                name: 'Checkout Button Color',
+                variants: 2,
+                hypothesis: 'Switching the checkout button from black to green will increase click-through rate by at least 5% due to higher contrast.',
+                placement: 'Campaign',
+                kpi: 'Click Rate',
+                sample: 5000,
+                control: { visitors: 2500, conversions: 120 },
+                variantB: { visitors: 2500, conversions: 150 },
+                link: '#'
+            },
+            {
+                id: 3,
+                status: 'Completed',
+                startDate: 'Oct 01, 2025',
+                endDate: 'Oct 15, 2025',
+                name: 'Subject Line Emoji Test',
+                variants: 3,
+                hypothesis: 'Including an emoji in the subject line will drive higher open rates for younger demographics.',
+                placement: 'Flow',
+                kpi: 'Open Rate',
+                sample: 120,
+                control: { visitors: 40, conversions: 5 },
+                variantB: { visitors: 40, conversions: 8 },
+                variantC: { visitors: 40, conversions: 4 },
+                link: '#'
+            }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('trackerBody');
+            tbody.innerHTML = '';
+
+            sections.forEach(section => {
+                const headerRow = document.createElement('tr');
+                let sectionClass = '';
+                if (section === 'Draft') sectionClass = 'section-draft';
+                else if (section === 'Active') sectionClass = 'section-active';
+                else if (section === 'Completed') sectionClass = 'section-completed';
+                
+                headerRow.className = `section-header ${sectionClass}`;
+                headerRow.innerHTML = `<td colspan="13">${section} Tests</td>`;
+                tbody.appendChild(headerRow);
+
+                const items = tests.filter(t => t.status === section);
+                
+                if (items.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `<td colspan="13" class="text-center text-gray-400 py-4 italic">No tests in this stage</td>`;
+                    tbody.appendChild(emptyRow);
+                }
+
+                items.forEach(test => {
+                    const row = document.createElement('tr');
+                    row.className = 'group hover:bg-gray-50';
+                    row.setAttribute('data-id', test.id);
+                    
+                    const calcResult = calculateSignificance(test);
+                    const hasC = test.variants >= 3;
+                    const hasD = test.variants >= 4;
+
+                    row.innerHTML = `
+                        <td>
+                            <div class="data-text font-medium">${test.startDate}</div>
+                            <div class="data-sub">${test.endDate}</div>
+                        </td>
+                        <td>
+                            <div class="data-text text-strong">${test.name}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-xs font-bold text-gray-600">${test.variants}</span>
+                        </td>
+                        <td>
+                            <p class="data-text text-gray-600 leading-relaxed text-xs">${test.hypothesis}</p>
+                        </td>
+                        <td>
+                            <span class="badge badge-placement">${test.placement}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-kpi">${test.kpi}</span>
+                        </td>
+                        <td>
+                            <span class="data-text font-mono text-gray-600">${test.sample.toLocaleString()}</span>
+                        </td>
+                        <td class="bg-gray-50 border-l border-gray-200">
+                            ${renderStats(test.control)}
+                        </td>
+                        <td class="bg-gray-50">
+                            ${renderStats(test.variantB)}
+                        </td>
+                        <td class="bg-gray-50">
+                            ${hasC ? renderStats(test.variantC) : '<span class="text-xs text-gray-300">-</span>'}
+                        </td>
+                        <td class="bg-gray-50 border-r border-gray-200">
+                            ${hasD ? renderStats(test.variantD) : '<span class="text-xs text-gray-300">-</span>'}
+                        </td>
+                        <td>
+                            ${calcResult}
+                        </td>
+                        <td class="text-center pt-6">
+                            <a href="${test.link}" target="_blank" class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        function renderStats(data) {
+            if(!data || (data.visitors === 0 && data.conversions === 0)) return '<span class="text-xs text-gray-400 italic">No Data</span>';
+            const rate = data.visitors > 0 ? ((data.conversions / data.visitors) * 100).toFixed(2) + '%' : '0.00%';
+            return `
+                <div class="stat-row"><span class="stat-label">Vis</span> <span class="stat-val">${data.visitors.toLocaleString()}</span></div>
+                <div class="stat-row"><span class="stat-label">Conv</span> <span class="stat-val">${data.conversions.toLocaleString()}</span></div>
+                <div class="stat-row mt-1 pt-1 border-t border-gray-200"><span class="stat-label text-black">CR</span> <span class="stat-val stat-cr">${rate}</span></div>
+            `;
+        }
+
+        function calculateSignificance(test) {
+            if (!test.control.visitors || test.control.visitors === 0) {
+                return '<div class="text-xs text-gray-400 italic text-center mt-2">Waiting for data...</div>';
+            }
+
+            const nA = test.control.visitors;
+            const cA = test.control.conversions;
+            
+            const variants = [
+                { name: 'B', n: test.variantB?.visitors || 0, c: test.variantB?.conversions || 0 },
+                { name: 'C', n: test.variantC?.visitors || 0, c: test.variantC?.conversions || 0 },
+                { name: 'D', n: test.variantD?.visitors || 0, c: test.variantD?.conversions || 0 }
+            ];
+
+            let bestVar = null;
+            let bestCR = -1;
+
+            variants.forEach(v => {
+                if (v.n > 0) {
+                    const cr = v.c / v.n;
+                    if (cr > bestCR) {
+                        bestCR = cr;
+                        bestVar = v;
+                    }
+                }
+            });
+
+            if (bestVar && bestVar.n > 0) {
+                const crA = cA / nA;
+                const crB = bestVar.c / bestVar.n;
+                const lift = ((crB - crA) / crA) * 100;
+                const pPool = (cA + bestVar.c) / (nA + bestVar.n);
+                const se = Math.sqrt(pPool * (1 - pPool) * ((1/nA) + (1/bestVar.n)));
+                let z = 0;
+                if(se > 0) z = (crB - crA) / se;
+
+                function GetZPercent(z) {
+                    if (z < -6.5) return 0;
+                    if (z > 6.5) return 1;
+                    var factK = 1, sum = 0, term = 1, k = 0, loopStop = Math.exp(-23);
+                    while(Math.abs(term) > loopStop) {
+                        term = .3989422804 * Math.pow(-1,k) * Math.pow(z,k) / (2 * k + 1) / Math.pow(2,k) * Math.pow(z,k+1);
+                        sum += term;
+                        k++;
+                        factK *= k;
+                    }
+                    sum += 0.5;
+                    return sum;
+                }
+                
+                let probability = GetZPercent(z) * 100;
+                
+                let badgeClass = 'sig-gray';
+                let badgeText = 'Not Significant';
+                
+                if (probability > 95) {
+                    badgeClass = 'sig-green';
+                    badgeText = 'Significant';
+                } else if (probability >= 90) {
+                    badgeClass = 'sig-yellow';
+                    badgeText = 'Close';
+                } else {
+                    badgeClass = 'sig-red';
+                    badgeText = 'Not Significant';
+                }
+
+                return `
+                    <div class="calc-box">
+                        <div class="calc-stat text-gray-500"><span>Best:</span> <span class="text-black">Var ${bestVar.name}</span></div>
+                        <div class="calc-stat text-gray-500"><span>Lift:</span> <span class="${lift >= 0 ? 'text-green-600' : 'text-red-600'}">${lift > 0 ? '+' : ''}${lift.toFixed(1)}%</span></div>
+                        <div class="calc-stat text-gray-500"><span>Conf:</span> <span class="text-black">${probability.toFixed(1)}%</span></div>
+                    </div>
+                    <span class="sig-badge ${badgeClass}">${badgeText}</span>
+                `;
+            }
+            
+            return '<div class="text-xs text-gray-400 italic text-center mt-2">Insufficient data</div>';
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>
