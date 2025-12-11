@@ -1,93 +1,211 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
-
-    // Cookie-based storage for Cloudflare Worker compatibility
-    const cookieStorage = {
-        getItem: (key) => {
-            const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
-            return match ? decodeURIComponent(match[2]) : null
-        },
-        setItem: (key, value) => {
-            document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
-        },
-        removeItem: (key) => {
-            document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Access | Roam</title>
+    <script src="favicon.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFCF8;
+            --bg-black: #050505;
+            --accent-orange: #EB5E28;
         }
-    }
-
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-        auth: {
-            storage: cookieStorage,
-            storageKey: 'sb-rtmewagtvmubpushnzag-auth-token',
-            autoRefreshToken: true,
-            persistSession: true,
-            detectSessionInUrl: true
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--bg-black);
         }
-    })
+        .btn-primary {
+            background-color: var(--accent-orange);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(235, 94, 40, 0.6);
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important;
+            -webkit-text-fill-color: #000 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-hidden">
+    
+    <div class="absolute inset-0 z-0 opacity-40" 
+         style="background-image: radial-gradient(#d4d4d4 1px, transparent 1px); background-size: 24px 24px;">
+    </div>
 
-    async function handleLogin() {
-        const email = document.getElementById('email').value
-        const password = document.getElementById('password').value
-        const btn = document.querySelector('.btn-primary')
-        const errorMsg = document.getElementById('login-error')
+    <nav class="w-full p-6 z-10 flex justify-between items-center">
+        <a href="main.html" class="text-xl font-extrabold tracking-tight text-black flex items-center gap-2 hover:opacity-70 transition-opacity">
+            <span class="w-2 h-2 bg-orange-600 rounded-full"></span>
+            Roam.
+        </a>
+        <a href="main.html" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors">
+            &larr; Return to HQ
+        </a>
+    </nav>
 
-        btn.textContent = 'AUTHENTICATING...'
-        btn.classList.add('opacity-75')
-        errorMsg.classList.add('hidden')
-        errorMsg.classList.remove('text-green-600')
-        errorMsg.classList.add('text-red-600')
+    <main class="flex-grow flex items-center justify-center p-6 pb-20 z-10">
+        <div class="w-full max-w-md">
+            
+            <div class="mb-10 text-center">
+                <p class="text-orange-600 font-mono text-xs mb-4 animate-pulse">:: SYSTEM ENTRY ::</p>
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-2 text-black">Welcome Back.</h1>
+                <p class="text-gray-600">Enter your credentials to access the OS.</p>
+            </div>
 
-        const { data, error } = await _supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
+            <div class="bg-white border border-black/5 p-8 md:p-10 rounded-xl shadow-2xl shadow-gray-200/50 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-600 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Email Protocol</label>
+                        <input type="email" id="email" 
+                            class="w-full bg-gray-50 border border-gray-200 p-4 text-sm text-black focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600 transition-all placeholder-gray-400 rounded-sm" 
+                            placeholder="name@company.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Security Key</label>
+                        <input type="password" id="password" 
+                            class="w-full bg-gray-50 border border-gray-200 p-4 text-sm text-black focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600 transition-all placeholder-gray-400 rounded-sm" 
+                            placeholder="••••••••">
+                    </div>
+
+                    <button type="button" onclick="handleLogin()" class="w-full btn-primary py-4 text-xs font-bold uppercase tracking-widest rounded-sm">
+                        Initialize Session
+                    </button>
+
+                    <div class="flex items-center gap-4 my-6">
+                        <div class="flex-1 h-px bg-gray-200"></div>
+                        <span class="text-xs text-gray-400 uppercase">or</span>
+                        <div class="flex-1 h-px bg-gray-200"></div>
+                    </div>
+
+                    <button type="button" onclick="signInWithGoogle()" class="w-full bg-white border border-gray-300 text-gray-700 py-4 text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-gray-50 flex items-center justify-center gap-3">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-4 h-4">
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <div class="mt-12 text-center border-t border-gray-100 pt-6">
+                    <p class="text-xs text-gray-400 mb-4">
+                        Forgot your key? <a href="#" onclick="resetPassword()" class="text-orange-600 hover:text-orange-500 transition-colors font-medium">Reset Protocol</a>
+                    </p>
+                    
+                    <p class="text-xs text-gray-400">
+                        No credentials? <a href="signup.html" class="text-black font-bold hover:text-orange-600 transition-colors">Request Access</a>
+                    </p>
+
+                    <p id="login-error" class="text-red-600 text-xs font-bold mt-4 hidden"></p>
+                </div>
+            </div>
+            
+            <p class="text-center text-[10px] uppercase tracking-widest text-gray-400 mt-20">
+                Restricted Access Area // Roam Inc. 2025
+            </p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://rtmewagtvmubpushnzag.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWV3YWd0dm11YnB1c2huemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDM2OTgsImV4cCI6MjA4MDgxOTY5OH0.jIdiAKJW4SUhAjOx-qw1g4EL8eMWsnhD_e9fqX8QUUs'
+
+        // Cookie-based storage for Cloudflare Worker compatibility
+        const cookieStorage = {
+            getItem: (key) => {
+                const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
+                return match ? decodeURIComponent(match[2]) : null
+            },
+            setItem: (key, value) => {
+                document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax; Secure`
+            },
+            removeItem: (key) => {
+                document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+            }
+        }
+
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                storage: cookieStorage,
+                storageKey: 'sb-rtmewagtvmubpushnzag-auth-token',
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
         })
 
-        if (error) {
-            errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
-            errorMsg.classList.remove('hidden')
-            btn.textContent = 'INITIALIZE SESSION'
-            btn.classList.remove('opacity-75')
-        } else {
-            window.location.href = "portal.html"
-        }
-    }
+        async function handleLogin() {
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            const btn = document.querySelector('.btn-primary')
+            const errorMsg = document.getElementById('login-error')
 
-    async function signInWithGoogle() {
-        const { data, error } = await _supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: { redirectTo: window.location.origin + '/portal.html' }
-        })
-        if (error) console.error(error)
-    }
+            btn.textContent = 'AUTHENTICATING...'
+            btn.classList.add('opacity-75')
+            errorMsg.classList.add('hidden')
+            errorMsg.classList.remove('text-green-600')
+            errorMsg.classList.add('text-red-600')
 
-    async function resetPassword() {
-        const email = document.getElementById('email').value
-        const errorMsg = document.getElementById('login-error')
-        
-        errorMsg.classList.add('hidden')
-        errorMsg.classList.remove('text-green-600')
-        errorMsg.classList.add('text-red-600')
-        
-        if (!email) {
-            errorMsg.textContent = "ENTER YOUR EMAIL FIRST, THEN CLICK RESET PROTOCOL"
-            errorMsg.classList.remove('hidden')
-            return
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            })
+
+            if (error) {
+                errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
+                errorMsg.classList.remove('hidden')
+                btn.textContent = 'INITIALIZE SESSION'
+                btn.classList.remove('opacity-75')
+            } else {
+                window.location.href = "portal.html"
+            }
         }
-        
-        const { data, error } = await _supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://goroam.cc/reset-password.html'
-        })
-        
-        if (error) {
-            errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
-            errorMsg.classList.remove('hidden')
-        } else {
-            errorMsg.textContent = "RESET LINK SENT: CHECK YOUR EMAIL"
-            errorMsg.classList.remove('hidden')
-            errorMsg.classList.remove('text-red-600')
-            errorMsg.classList.add('text-green-600')
+
+        async function signInWithGoogle() {
+            const { data, error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/portal.html' }
+            })
+            if (error) console.error(error)
         }
-    }
-</script>
+
+        async function resetPassword() {
+            const email = document.getElementById('email').value
+            const errorMsg = document.getElementById('login-error')
+            
+            errorMsg.classList.add('hidden')
+            errorMsg.classList.remove('text-green-600')
+            errorMsg.classList.add('text-red-600')
+            
+            if (!email) {
+                errorMsg.textContent = "ENTER YOUR EMAIL FIRST, THEN CLICK RESET PROTOCOL"
+                errorMsg.classList.remove('hidden')
+                return
+            }
+            
+            const { data, error } = await _supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: 'https://goroam.cc/reset-password.html'
+            })
+            
+            if (error) {
+                errorMsg.textContent = "ERROR: " + error.message.toUpperCase()
+                errorMsg.classList.remove('hidden')
+            } else {
+                errorMsg.textContent = "RESET LINK SENT: CHECK YOUR EMAIL"
+                errorMsg.classList.remove('hidden')
+                errorMsg.classList.remove('text-red-600')
+                errorMsg.classList.add('text-green-600')
+            }
+        }
+    </script>
+</body>
+</html>
