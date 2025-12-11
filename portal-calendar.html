@@ -1,1 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Calendar | Roam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="portal-styles.css">
+    <style>
+        /* --- PAGE-SPECIFIC CALENDAR STYLES --- */
+        .calendar-wrapper {
+            background: #fff; border: 1px solid var(--border-light); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display: none;
+            height: 100%; display: flex; flex-direction: column;
+        }
+        @media (min-width: 768px) { .calendar-wrapper { display: flex; } }
 
+        .cal-header { display: grid; grid-template-columns: repeat(7, 1fr); background: #f9fafb; border-bottom: 1px solid var(--border-light); flex-shrink: 0; }
+        .cal-day-label { padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.05em; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); flex-grow: 1; grid-auto-rows: 1fr; overflow: hidden; }
+        .cal-cell { 
+            border-right: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding: 0.5rem; position: relative; transition: background 0.2s; 
+            min-height: 0; height: 100%; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .cal-cell:hover { background: #fafafa; }
+        .cal-date { font-size: 0.8rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; flex-shrink: 0; }
+        .cal-date.muted { color: #ccc; }
+        
+        .cal-event { 
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; font-weight: 600; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.1s; flex-shrink: 0; 
+            border: 1px solid transparent;
+        }
+        .cal-event:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .event-email { background: #F3F4F6; color: #1F2937; border-left: 3px solid #111; }
+        .event-sms { background: #FFF7ED; color: #9A3412; border-left: 3px solid var(--accent-orange); }
+
+        /* --- POPOVER CARD STYLES --- */
+        #eventPopover {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        .popover-hidden { opacity: 0; pointer-events: none; transform: scale(0.98); }
+        .popover-visible { opacity: 1; pointer-events: auto; transform: scale(1); }
+        
+        /* Mobile Agenda */
+        .mobile-agenda { display: block; }
+        @media (min-width: 768px) { .mobile-agenda { display: none; } }
+        .agenda-day { margin-bottom: 1.5rem; }
+        .agenda-date { font-size: 0.85rem; font-weight: 700; color: #666; margin-bottom: 0.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.25rem; display: flex; justify-content: space-between; }
+        .agenda-event-card { background: #fff; border: 1px solid var(--border-light); border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .agenda-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-right: 1rem; flex-shrink: 0; }
+        .icon-email { background: #f3f4f6; color: #111; }
+        .icon-sms { background: #FFF7ED; color: var(--accent-orange); }
+    </style>
+</head>
+<body data-page="calendar">
+
+    <!-- Redesigned Event Popover (Floating Card) -->
+    <div id="eventPopover" class="fixed z-[100] popover-hidden bg-white rounded-lg w-80 overflow-hidden shadow-xl border border-gray-100">
+        <div id="popoverStrip" class="absolute top-0 bottom-0 left-0 w-1.5 bg-black"></div>
+        
+        <div class="px-5 pt-4 pb-2 pl-6">
+            <div class="flex justify-between items-start mb-2">
+                <span id="popoverStatus" class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Scheduled</span>
+                <button id="popoverCloseBtn" onclick="unlockPopover()" class="text-gray-400 hover:text-black hidden transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-start gap-3">
+                <div id="popoverChannelIcon" class="mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-gray-100 text-gray-600"></div>
+                <h3 id="popoverTitle" class="text-base font-bold text-gray-900 leading-tight">Campaign Title</h3>
+            </div>
+        </div>
+
+        <div class="px-5 py-3 pl-6 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-5 flex justify-center text-gray-400"><i class="fa-regular fa-clock text-xs"></i></div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase leading-none">Send Time</p>
+                    <p id="popoverTime" class="text-xs font-medium text-gray-800 leading-tight mt-0.5">10:00 AM EST</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <div class="w-5 flex-shrink-0 flex justify-center text-gray-400 mt-0.5"><i class="fa-solid fa-users-viewfinder text-xs"></i></div>
+                <div class="flex-grow">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">Segments</p>
+                    <p id="popoverSegments" class="text-xs font-medium text-gray-800 leading-snug">All Active, Recent Purchasers, VIP High LTV</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-5 py-3 pl-6 bg-gray-50 border-t border-gray-100 flex gap-2">
+             <a href="#" class="flex-1 text-center py-2 rounded border border-gray-200 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-colors group">
+                <i class="fa-solid fa-file-lines mr-1.5 text-blue-600 group-hover:text-blue-700"></i> Copy Doc
+             </a>
+             <a href="#" class="flex-1 text-center py-2 rounded border border-gray-200 bg-white text-xs font-bold text-gray-600 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition-colors group">
+                <i class="fa-brands fa-figma mr-1.5 text-purple-600 group-hover:text-purple-700"></i> Figma
+             </a>
+        </div>
+    </div>
+
+    <!-- Nav loads automatically via portal-nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex flex-col h-screen">
+        <div class="mobile-header flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()" class="text-black text-xl p-1"><i class="fa-solid fa-bars"></i></button>
+                <span class="text-xl font-bold tracking-tight text-black">Roam.</span>
+            </div>
+        </div>
+
+        <header class="desktop-header flex-shrink-0">
+            <h1 class="text-3xl font-bold text-black">Content Calendar</h1>
+            <div class="flex items-center gap-4 h-10">
+                <div class="flex items-center gap-3 px-3 h-full bg-white border border-gray-200 rounded-md shadow-sm box-border">
+                    <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)] animate-pulse flex-shrink-0"></div>
+                    <div class="flex flex-col justify-center">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 leading-none mb-0.5">Automatic Sync Enabled</span>
+                        <a href="#" class="text-xs font-bold text-gray-700 leading-none hover:text-black hover:underline transition-colors">Master_Content_Q4</a>
+                    </div>
+                </div>
+
+                <button class="px-4 h-full bg-black text-white rounded text-sm font-bold hover:bg-gray-800 transition-colors shadow-sm flex items-center">
+                    <i class="fa-solid fa-arrows-rotate mr-2"></i> Manual Sync
+                </button>
+            </div>
+        </header>
+
+        <div class="lg:hidden mb-6 flex-shrink-0">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold text-black">Calendar</h1>
+                <button class="text-xs font-bold text-orange-600 border border-orange-200 px-3 py-1 rounded bg-orange-50">Sync</button>
+            </div>
+        </div>
+
+        <div class="flex-grow min-h-0 flex flex-col pb-6">
+            <div class="hidden lg:flex justify-between items-center mb-4 flex-shrink-0">
+                <h2 id="currentMonthDisplay" class="text-lg font-bold">November 2025</h2>
+                <div class="flex gap-2">
+                    <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-black transition"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-black transition"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="calendar-wrapper flex-grow">
+                <div class="cal-header">
+                    <div class="cal-day-label">Sun</div><div class="cal-day-label">Mon</div><div class="cal-day-label">Tue</div><div class="cal-day-label">Wed</div><div class="cal-day-label">Thu</div><div class="cal-day-label">Fri</div><div class="cal-day-label">Sat</div>
+                </div>
+                <div id="calendarGrid" class="cal-grid"></div>
+            </div>
+
+            <div class="mobile-agenda">
+                <div class="agenda-day">
+                    <div class="agenda-date">Wed, Nov 1</div>
+                    <div class="agenda-event-card">
+                        <div class="agenda-icon icon-email"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-black">New Arrival Drop</h4>
+                            <p class="text-xs text-gray-500">10:00 AM • Segment: All Active</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared Navigation -->
+    <script src="portal-nav.js"></script>
+
+    <!-- Page-specific scripts -->
+    <script>
+        // --- CALENDAR DATA ---
+        const calendarData = {
+            '2025-11-01': [{ title: 'New Arrival Drop', type: 'email', time: '10:00 AM EST', segments: 'All Active, Recent Purchasers', status: 'Scheduled' }],
+            '2025-11-03': [{ title: 'VIP Early Access', type: 'sms', time: '12:00 PM EST', segments: 'VIP High LTV, Loyalty Tier 1', status: 'Scheduled' }],
+            '2025-11-06': [{ title: 'Back in Stock', type: 'email', time: '09:00 AM EST', segments: 'Browsers (30d), Cart Abandoners', status: 'Drafting' }],
+            '2025-11-09': [{ title: 'Newsletter: Trends', type: 'email', time: '11:00 AM EST', segments: 'Newsletter Subs', status: 'Drafting' }],
+            '2025-11-11': [{ title: 'Flash Sale (4h)', type: 'sms', time: '04:00 PM EST', segments: 'All SMS Subscribers', status: 'Scheduled' }],
+            '2025-11-14': [{ title: 'Black Friday Tease', type: 'email', time: '08:00 AM EST', segments: 'All Active', status: 'Drafting' }]
+        };
+
+        let currentDate = new Date(2025, 10, 1);
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthDisplay = document.getElementById('currentMonthDisplay');
+            grid.innerHTML = ''; 
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            monthDisplay.innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+                const dayNum = daysInPrevMonth - i;
+                const cell = document.createElement('div');
+                cell.className = 'cal-cell bg-gray-50/50';
+                cell.innerHTML = `<span class="cal-date muted">${dayNum}</span>`;
+                grid.appendChild(cell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-cell';
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                cell.innerHTML = `<span class="cal-date">${day}</span>`;
+                
+                if (calendarData[dateKey]) {
+                    calendarData[dateKey].forEach(evt => {
+                         const evtClass = evt.type === 'email' ? 'event-email' : 'event-sms';
+                         const eventDiv = document.createElement('div');
+                         eventDiv.className = `cal-event ${evtClass}`;
+                         eventDiv.innerText = evt.title;
+                         
+                         eventDiv.addEventListener('mouseenter', (e) => showPopover(e, evt));
+                         eventDiv.addEventListener('mouseleave', () => hidePopover());
+                         eventDiv.addEventListener('click', (e) => {
+                             e.stopPropagation();
+                             lockPopover(e, evt);
+                         });
+                         
+                         cell.appendChild(eventDiv);
+                    });
+                }
+                grid.appendChild(cell);
+            }
+
+            const totalCells = firstDayOfMonth + daysInMonth;
+            const remainingCells = (7 - (totalCells % 7)) % 7;
+            for (let i = 1; i <= remainingCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-cell bg-gray-50/50';
+                cell.innerHTML = `<span class="cal-date muted">${i}</span>`;
+                grid.appendChild(cell);
+            }
+        }
+
+        function changeCalendarMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // --- POPOVER INTERACTION ---
+        const popover = document.getElementById('eventPopover');
+        const popoverCloseBtn = document.getElementById('popoverCloseBtn');
+        let isPopoverLocked = false;
+
+        function updatePopoverContent(data) {
+            document.getElementById('popoverTitle').innerText = data.title;
+            document.getElementById('popoverTime').innerText = data.time;
+            document.getElementById('popoverSegments').innerText = data.segments;
+            document.getElementById('popoverStatus').innerText = data.status;
+
+            const strip = document.getElementById('popoverStrip');
+            const iconContainer = document.getElementById('popoverChannelIcon');
+            
+            if (data.type === 'email') {
+                strip.className = 'absolute top-0 bottom-0 left-0 w-1.5 bg-black';
+                iconContainer.className = 'mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-gray-100 text-gray-800';
+                iconContainer.innerHTML = '<i class="fa-solid fa-envelope text-xs"></i>';
+            } else {
+                strip.className = 'absolute top-0 bottom-0 left-0 w-1.5 bg-orange-600';
+                iconContainer.className = 'mt-1 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-orange-50 text-orange-600';
+                iconContainer.innerHTML = '<i class="fa-solid fa-comment-sms text-xs"></i>';
+            }
+        }
+
+        function showPopover(event, data) {
+            if (isPopoverLocked) return;
+
+            updatePopoverContent(data);
+            popoverCloseBtn.classList.add('hidden');
+            
+            const rect = event.target.getBoundingClientRect();
+            const popoverWidth = 320;
+            const windowWidth = window.innerWidth;
+            
+            let top = rect.bottom + window.scrollY + 5;
+            let left = rect.left + window.scrollX;
+
+            if (left + popoverWidth > windowWidth - 20) {
+                left = (rect.right + window.scrollX) - popoverWidth;
+            }
+
+            popover.style.top = `${top}px`;
+            popover.style.left = `${left}px`;
+            popover.classList.remove('popover-hidden');
+            popover.classList.add('popover-visible');
+        }
+
+        function hidePopover() {
+            if (isPopoverLocked) return;
+            popover.classList.remove('popover-visible');
+            popover.classList.add('popover-hidden');
+        }
+
+        function lockPopover(event, data) {
+            updatePopoverContent(data);
+            
+            const rect = event.target.getBoundingClientRect();
+            const popoverWidth = 320;
+            const windowWidth = window.innerWidth;
+            
+            let top = rect.bottom + window.scrollY + 5;
+            let left = rect.left + window.scrollX;
+            if (left + popoverWidth > windowWidth - 20) {
+                left = (rect.right + window.scrollX) - popoverWidth;
+            }
+            
+            popover.style.top = `${top}px`;
+            popover.style.left = `${left}px`;
+            
+            isPopoverLocked = true;
+            popover.classList.remove('popover-hidden');
+            popover.classList.add('popover-visible');
+            popoverCloseBtn.classList.remove('hidden');
+        }
+
+        function unlockPopover() {
+            isPopoverLocked = false;
+            hidePopover();
+        }
+
+        document.addEventListener('click', function(event) {
+            if (isPopoverLocked) {
+                const isClickInside = popover.contains(event.target);
+                if (!isClickInside && !event.target.classList.contains('cal-event')) {
+                    unlockPopover();
+                }
+            }
+        });
+
+        renderCalendar();
+    </script>
+</body>
+</html>
